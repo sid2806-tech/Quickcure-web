@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quickcure App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Container to simulate a mobile phone screen */
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            height: 90vh;
+            max-height: 800px;
+            background-color: #fff;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Custom scrollbar for chat history */
+        .chat-history::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-history::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb {
+            background-color: #e5e7eb;
+            border-radius: 4px;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb:hover {
+            background-color: #d1d5db;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .avatar {
+            width: 280px;
+            height: 280px;
+        }
+
+        .avatar-stage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="app-container">
+        <!-- Landing Page -->
+        <div id="landing-page" class="flex-1 flex flex-col items-center justify-center p-8 text-center transition-opacity duration-500 ease-in-out opacity-100">
+            <!-- Inline SVG Logo -->
+            <svg class="w-40 h-40 mb-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#14B8A6"/>
+                <path d="M16 9L10 15L8 13" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Quickcure</h1>
+            <p class="text-lg text-gray-500 font-semibold mb-8">Smart care, Anytime, Anywhere.</p>
+            <button id="get-started-btn" class="bg-teal-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-teal-600 transition-colors">
+                Get Started
+            </button>
+            <p class="mt-4 text-xs text-gray-400">Copyright © 2025 Quickcure</p>
+        </div>
+
+        <!-- Language Selection Page -->
+        <div id="language-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center justify-between shadow-sm rounded-t-2xl">
+                <button id="back-from-language-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 text-center">
+                    <h1 class="text-xl font-bold text-gray-800">Select Language</h1>
+                </div>
+            </header>
+            <main class="flex-1 flex flex-col items-center justify-center p-8 space-y-4">
+                <p class="text-lg font-medium text-gray-700">Select your language</p>
+                <button id="lang-en" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    English
+                </button>
+                <button id="lang-hi" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    हिंदी
+                </button>
+                <button id="lang-mr" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    मराठी
+                </button>
+                <button id="lang-bn" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    বাংলা
+                </button>
+                <button id="lang-ta" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    தமிழ்
+                </button>
+                <button id="lang-te" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    తెలుగు
+                </button>
+                <button id="lang-kn" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    ಕನ್ನಡ
+                </button>
+                <button id="lang-ml" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    മലയാളം
+                </button>
+                <button id="lang-gu" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    ગુજરાતી
+                </button>
+                <button id="lang-pa" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    ਪੰਜਾਬੀ
+                </button>
+                <button id="lang-or" class="w-full bg-gray-200 text-gray-800 px-4 py-3 rounded-xl hover:bg-gray-300 transition-colors">
+                    ଓଡ଼ିଆ
+                </button>
+            </main>
+        </div>
+
+        <!-- User Info Page -->
+        <div id="user-info-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center justify-between shadow-sm rounded-t-2xl">
+                <button id="back-from-user-info-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 text-center">
+                    <h1 id="user-info-title" class="text-xl font-bold text-gray-800">Provide Your Details</h1>
+                </div>
+            </header>
+            <main class="flex-1 flex flex-col justify-center p-8 space-y-6">
+                <form id="user-info-form" class="space-y-4">
+                    <div>
+                        <label for="gender-select" id="gender-label" class="block text-sm font-medium text-gray-700">Gender</label>
+                        <select id="gender-select" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+                            <option id="gender-option-male" value="male">Male</option>
+                            <option id="gender-option-female" value="female">Female</option>
+                            <option id="gender-option-other" value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="age-input" id="age-label" class="block text-sm font-medium text-gray-700">Age</label>
+                        <input type="number" id="age-input" placeholder="Enter your age" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500">
+                    </div>
+                    <div>
+                        <label for="diseases-input" id="diseases-label" class="block text-sm font-medium text-gray-700">Any pre-existing diseases (e.g., BP, diabetes)</label>
+                        <input type="text" id="diseases-input" placeholder="Enter diseases (optional)" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                    </div>
+                    <button type="submit" id="submit-user-info-btn" class="w-full bg-teal-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-teal-600 transition-colors">
+                        Continue
+                    </button>
+                </form>
+            </main>
+        </div>
+        
+        <!-- Mode Selection Page -->
+        <div id="mode-selection-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center justify-between shadow-sm rounded-t-2xl">
+                <button id="back-from-mode-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 text-center">
+                    <h1 class="text-xl font-bold text-gray-800">Select an Option</h1>
+                </div>
+            </header>
+            <main class="flex-1 flex flex-col items-center justify-center p-8 space-y-4">
+                <button id="chatbot-btn" class="w-full bg-teal-500 text-white font-bold px-4 py-6 rounded-xl shadow-lg hover:bg-teal-600 transition-colors text-center">
+                    AI Doctor
+                </button>
+                <button id="awareness-btn" class="w-full bg-blue-500 text-white font-bold px-4 py-6 rounded-xl shadow-lg hover:bg-blue-600 transition-colors text-center">
+                    Health Awareness
+                </button>
+                <button id="video-call-btn" class="w-full bg-red-500 text-white font-bold px-4 py-6 rounded-xl shadow-lg hover:bg-red-600 transition-colors text-center">
+                    AI Video Call
+                </button>
+            </main>
+        </div>
+
+        <!-- Chat Page -->
+        <div id="chat-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <!-- Header -->
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center justify-between shadow-sm rounded-t-2xl">
+                <button id="back-to-mode-btn-from-chat" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 flex items-center justify-center space-x-3">
+                    <div id="doctor-image-container" class="w-10 h-10 flex items-center justify-center rounded-full text-white font-bold text-lg bg-teal-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">Quickcure AI</h1>
+                </div>
+                <div class="relative">
+                    <button id="menu-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                            <path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM12 12a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 18a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="menu-dropdown" class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10 hidden">
+                        <a href="#" id="profile-menu-item" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                        <a href="#" id="history-menu-item" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">History</a>
+                        <a href="#" id="yoga-menu-item" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Yoga Information</a>
+                        <a href="#" id="basic-medicine-menu-item" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Basic Medicine Information</a>
+                        <a href="#" id="logout-menu-item" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Chat History -->
+            <main class="flex-1 p-4 overflow-y-auto chat-history space-y-4">
+                <!-- Welcome Message -->
+                <div class="flex justify-start">
+                    <div class="bg-blue-500 text-white p-4 rounded-xl max-w-[80%]">
+                        <p id="chat-welcome-message">Hello! I'm your personal health assistant. Describe your symptoms or concerns, and I'll do my best to provide information and guidance. How can I help you today?</p>
+                    </div>
+                </div>
+
+                <!-- Pre-defined user suggestions -->
+                <div id="pre-defined-options" class="flex flex-col space-y-2">
+                    <button onclick="selectPrompt('I have a persistent cough and sore throat.')" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-full text-sm hover:bg-gray-300 transition-colors">
+                        I have a persistent cough and sore throat.
+                    </button>
+                    <button onclick="selectPrompt('What are some common causes of headaches?')" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-full text-sm hover:bg-gray-300 transition-colors">
+                        What are some common causes of headaches?
+                    </button>
+                    <button onclick="selectPrompt('My stomach hurts after eating.')" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-full text-sm hover:bg-gray-300 transition-colors">
+                        My stomach hurts after eating.
+                    </button>
+                </div>
+            </main>
+
+            <!-- Input Area -->
+            <div class="p-4 bg-white border-t border-gray-200 rounded-b-2xl">
+                <form id="chat-form" class="flex space-x-2">
+                    <input id="user-input" type="text" placeholder="Describe your symptoms..." class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all">
+                    <button type="button" id="mic-button" class="bg-gray-200 text-gray-800 p-3 rounded-full hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path d="M12 18.75a6 6 0 006-6v-1.5a6 6 0 00-12 0v1.5a6 6 0 006 6zM12 2.25a.75.75 0 01.75.75v6a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM12 15a2.25 2.25 0 002.25-2.25v-1.5a2.25 2.25 0 00-4.5 0v1.5A2.25 2.25 0 0012 15z" />
+                            <path d="M12 3.75a.75.75 0 01.75.75v6a.75.75 0 01-1.5 0V4.5a.75.75 0 01.75-.75z" />
+                            <path fill-rule="evenodd" d="M12 21.75a.75.75 0 01-.75-.75v-2.193A9.002 9.002 0 013.75 12a.75.75 0 011.5 0 7.5 7.5 0 007.5 7.5.75.75 0 010 1.5A9.002 9.002 0 0112.75 18.807V21a.75.75 0 01-.75.75z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <button type="submit" class="bg-teal-500 text-white p-3 rounded-full hover:bg-teal-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.965-2.432 7.965a.75.75 0 00.926.94 8.787 8.787 0 008.73-7.535l1.636-.549a.75.75 0 000-1.42l-1.636-.549a8.787 8.787 0 00-8.73-7.535z" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Health Awareness Page -->
+        <div id="awareness-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center shadow-sm rounded-t-2xl">
+                <button id="back-to-mode-btn-from-awareness" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 text-center">
+                    <h1 class="text-xl font-bold text-gray-800">Health Awareness</h1>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800 mb-2">General Health Tips</h2>
+                        <div class="bg-green-100 text-green-800 p-4 rounded-lg">
+                            <h3 class="font-semibold mb-2">What to Do:</h3>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Stay hydrated by drinking plenty of water throughout the day.</li>
+                                <li>Eat a balanced diet rich in fruits, vegetables, lean proteins, and whole grains.</li>
+                                <li>Engage in regular physical activity, aiming for at least 30 minutes most days.</li>
+                                <li>Ensure you get 7-9 hours of quality sleep per night.</li>
+                                <li>Practice good hygiene, like washing your hands frequently.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-red-100 text-red-800 p-4 rounded-lg mt-4">
+                            <h3 class="font-semibold mb-2">What Not to Do:</h3>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Avoid excessive consumption of sugar, processed foods, and unhealthy fats.</li>
+                                <li>Do not smoke or use tobacco products.</li>
+                                <li>Limit alcohol intake.</li>
+                                <li>Avoid skipping meals.</li>
+                                <li>Do not ignore persistent symptoms; consult a healthcare professional.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800 mb-2">Mental Health Awareness</h2>
+                        <div class="bg-green-100 text-green-800 p-4 rounded-lg">
+                            <h3 class="font-semibold mb-2">What to Do:</h3>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Stay connected with friends and family.</li>
+                                <li>Practice mindfulness or meditation.</li>
+                                <li>Spend time in nature.</li>
+                                <li>Limit screen time and social media.</li>
+                                <li>Seek professional help if you feel overwhelmed or persistently sad.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-red-100 text-red-800 p-4 rounded-lg mt-4">
+                            <h3 class="font-semibold mb-2">What Not to Do:</h3>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Do not isolate yourself.</li>
+                                <li>Avoid using drugs or alcohol as a coping mechanism.</li>
+                                <li>Do not overcommit and burn yourself out.</li>
+                                <li>Do not be afraid to talk about your feelings.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- AI Video Call Page (Interactive Voice) -->
+        <div id="video-call-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden bg-gray-900">
+            <header class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between shadow-sm rounded-t-2xl">
+                <button id="back-from-video-call-btn" class="text-gray-400 hover:text-gray-100 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 text-center">
+                    <h1 class="text-xl font-bold text-gray-200" id="video-call-title">AI Video Call</h1>
+                </div>
+            </header>
+            <main class="flex-1 flex flex-col justify-between items-center p-4 bg-gray-900 text-white">
+                
+                <!-- AI Doctor Avatar (Interactive SVG) -->
+                <div class="avatar-stage mt-6">
+                    <svg class="avatar" viewBox="0 0 200 200" id="avatarSvg">
+                        <defs>
+                            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.45"/></filter>
+                        </defs>
+                        <g transform="translate(100,100)">
+                            <!-- Hair -->
+                            <path d="M-80,-60 C -100,-80 -60,-100 0,-100 C 60,-100 100,-80 80,-60 L 80,0 C 80,40 50,70 0,70 C -50,70 -80,40 -80,0 Z" fill="#4B5563" filter="url(#shadow)"/>
+                            <!-- Face -->
+                            <circle cx="0" cy="0" r="70" fill="#fce4c4" stroke="#d4ac87" stroke-width="2" />
+                            <!-- Eyes -->
+                            <g transform="translate(0,-15)">
+                                <circle cx="-25" cy="0" r="8" fill="#1b2b36"/>
+                                <circle cx="25" cy="0" r="8" fill="#1b2b36"/>
+                                <circle cx="-27" cy="-2" r="3" fill="#fff" opacity="0.9"/>
+                                <circle cx="23" cy="-2" r="3" fill="#fff" opacity="0.9"/>
+                            </g>
+                            <!-- Glasses -->
+                            <path d="M-35,-15 H -15 M 15,-15 H 35 M -15,-15 H 15" stroke="#1F2937" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="-25" cy="-15" r="15" stroke="#1F2937" stroke-width="2" fill="none"/>
+                            <circle cx="25" cy="-15" r="15" stroke="#1F2937" stroke-width="2" fill="none"/>
+                            <!-- Mouth Group (For Lip Sync) -->
+                            <g id="mouthGroup" transform="translate(0,30)">
+                                <path id="mouth" d="M-20,0 C -10,10 10,10 20,0 Q 10,2 -20,0 Z" fill="#8B5F65"/>
+                            </g>
+                            <!-- Stethoscope -->
+                            <path d="M 0,100 Q -60,80 -60,20 Q -60,-40 0,-40 Q 60,-40 60,20 Q 60,80 0,100" fill="none" stroke="#6B7280" stroke-width="3"/>
+                            <circle cx="0" cy="100" r="12" fill="#6B7280" stroke="#1F2937" stroke-width="2"/>
+                            <circle cx="0" cy="100" r="6" fill="#1F2937"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Voice Log and User Prompts -->
+                <div id="video-log" class="text-center bg-gray-800 p-4 rounded-xl w-full max-w-xs mt-8">
+                    <p id="video-log-text" class="text-sm text-gray-300">Tap the screen to begin your voice consultation.</p>
+                </div>
+                <div class="text-center text-xs text-gray-500 mt-4">
+                    <p id="video-tap-prompt">Tap anywhere on the screen to start speaking.</p>
+                </div>
+            </main>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <!-- Header -->
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center shadow-sm rounded-t-2xl">
+                <button id="back-to-chat-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 flex items-center justify-center space-x-2">
+                    <div class="w-8 h-8 text-gray-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18.68 6.25l-2.02 2.02a4.5 4.5 0 01-6.12 0l-2.02-2.02a.75.75 0 011.06-1.06l2.02 2.02a3 3 0 004.24 0l2.02-2.02a.75.75 0 011.06 1.06zM9 13.5a3 3 0 116 0 3 3 0 01-6 0z" clip-rule="evenodd" />
+                            <path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12 20.25a8.25 8.25 0 100-16.5 8.25 8.25 0 000 16.5z" />
+                        </svg>
+                    </div>
+                    <h1 id="profile-title" class="text-xl font-bold text-gray-800">Profile</h1>
+                </div>
+            </header>
+
+            <!-- Profile Content -->
+            <main class="flex-1 flex flex-col items-center justify-center p-8 space-y-6">
+                <div class="bg-gray-100 p-8 rounded-full mb-4">
+                    <svg class="w-24 h-24 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.94 0 3.5 1.56 3.5 3.5S13.94 12 12 12 8.5 10.44 8.5 8.5 10.06 5 12 5zm0 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </div>
+                <div class="bg-gray-200 p-8 rounded-2xl w-full text-center">
+                    <h2 id="verify-info-title" class="text-lg font-semibold text-gray-700 mb-4">Verify your information</h2>
+                    <p id="verify-info-text" class="text-sm text-gray-500 mb-6">
+                        Verify your mobile number to securely access and save your chat history.
+                    </p>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <input type="tel" id="mobile-input" placeholder="Enter mobile number" class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <button id="send-otp-btn" class="bg-teal-500 text-white p-3 rounded-full hover:bg-teal-600 transition-colors">
+                            Send OTP
+                        </button>
+                    </div>
+                </div>
+                <div class="relative w-full text-center">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span id="or-text" class="bg-white px-2 text-gray-500">or</span>
+                    </div>
+                </div>
+                <button id="google-signin-btn" class="bg-gray-800 text-white font-bold py-3 px-8 rounded-full flex items-center justify-center space-x-2 w-full hover:bg-gray-900 transition-colors mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="currentColor" class="w-6 h-6">
+                        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.614 3.197-4.498 5.485-8.303 6.485v-1.798c2.454-.664 4.414-2.226 5.645-4.524H24v-4.148h19.611z"/>
+                        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-5.645-4.321C29.623 35.881 26.96 36.6 24 36.6c-5.746 0-10.741-3.882-12.55-9.14l-5.651 4.322C8.37 40.855 15.65 44 24 44z"/>
+                        <path fill="#1976D2" d="M24 7.4c3.291 0 6.444 1.196 8.887 3.344l5.221-5.074C34.825 2.923 29.646 0 24 0 15.65 0 8.37 3.145 2.5 8.795l5.651 4.322C11.259 8.282 16.254 4.4 24 4.4z"/>
+                        <path fill="#F44336" d="M41.611 20.083H24V28h11.303c-1.614 3.197-4.498 5.485-8.303 6.485v-1.798c2.454-.664 4.414-2.226 5.645-4.524H24v-4.148h19.611z" />
+                    </svg>
+                    <span>Sign in with Google</span>
+                </button>
+            </main>
+        </div>
+
+        <!-- History Page -->
+        <div id="history-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center shadow-sm rounded-t-2xl">
+                <button id="back-from-history-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 text-center">
+                    <h1 id="history-title" class="text-xl font-bold text-gray-800">History</h1>
+                </div>
+            </header>
+            <main class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                <p id="history-content" class="text-gray-500">Your chat history will appear here once you've signed in.</p>
+            </main>
+        </div>
+        
+        <!-- Yoga Information Page -->
+        <div id="yoga-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center shadow-sm rounded-t-2xl">
+                <button id="back-from-yoga-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 text-center">
+                    <h1 id="yoga-title" class="text-xl font-bold text-gray-800">Yoga Information</h1>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="space-y-8">
+                    <div>
+                        <h2 id="yoga-standing-title" class="text-lg font-bold text-gray-800 mb-2">Standing Poses</h2>
+                        <img class="w-full rounded-lg mb-2" src="https://placehold.co/400x200/52c676/000?text=Standing+Poses" alt="Standing Poses">
+                        <p id="yoga-standing-text" class="text-sm text-gray-600 mb-4">
+                            Standing poses are foundational to yoga practice, helping to build strength, balance, and stability throughout the body. They engage the legs, core, and back muscles to create a strong base, while also improving posture and alignment.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>Big Toe</li>
+                            <li>Bird of Paradise</li>
+                            <li>Chair</li>
+                            <li>Crescent Lunge</li>
+                            <li>Warrior I, II, and III</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="yoga-seated-title" class="text-lg font-bold text-gray-800 mb-2">Seated Poses</h2>
+                        <img class="w-full rounded-lg mb-2" src="https://placehold.co/400x200/52c676/000?text=Seated+Poses" alt="Seated Poses">
+                        <p id="yoga-seated-text" class="text-sm text-gray-600 mb-4">
+                            Seated poses are excellent for increasing flexibility in the hips, hamstrings, and groin. They promote a sense of calm and grounding, making them perfect for meditation and deep stretching.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>Archer's</li>
+                            <li>Boat</li>
+                            <li>Bound Angle</li>
+                            <li>Cow Face</li>
+                            <li>Lotus</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="yoga-supine-title" class="text-lg font-bold text-gray-800 mb-2">Supine Poses</h2>
+                        <img class="w-full rounded-lg mb-2" src="https://placehold.co/400x200/52c676/000?text=Supine+Poses" alt="Supine Poses">
+                        <p id="yoga-supine-text" class="text-sm text-gray-600 mb-4">
+                            Supine poses, performed lying on your back, are ideal for relaxation and gentle stretching. They can help release tension from the spine and hips, calm the nervous system, and prepare the body for rest.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>Banana</li>
+                            <li>Bridge</li>
+                            <li>Corpse</li>
+                            <li>Fish</li>
+                            <li>Happy Baby</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="yoga-prone-title" class="text-lg font-bold text-gray-800 mb-2">Prone Poses</h2>
+                        <img class="w-full rounded-lg mb-2" src="https://placehold.co/400x200/52c676/000?text=Prone+Poses" alt="Prone Poses">
+                        <p id="yoga-prone-text" class="text-sm text-gray-600 mb-4">
+                            Prone poses are done lying on your stomach and are great for strengthening the back muscles and opening the chest. They can also help relieve back pain and improve spinal flexibility.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>Bow</li>
+                            <li>Child's</li>
+                            <li>Cobra</li>
+                            <li>Sphinx</li>
+                            <li>Wheel</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="yoga-support-title" class="text-lg font-bold text-gray-800 mb-2">Arm & Leg Support Poses</h2>
+                        <img class="w-full rounded-lg mb-2" src="https://placehold.co/400x200/52c676/000?text=Arm+and+Leg+Support" alt="Arm & Leg Support Poses">
+                        <p id="yoga-support-text" class="text-sm text-gray-600 mb-4">
+                            These poses require you to bear weight on your arms or legs, building significant strength in your limbs and core. They are excellent for developing balance, stability, and full-body control.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>Camel</li>
+                            <li>Cat</li>
+                            <li>Downward-Facing Dog</li>
+                            <li>Plank</li>
+                            <li>Wheel</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="yoga-balance-title" class="text-lg font-bold text-gray-800 mb-2">Arm Balance & Inversion Poses</h2>
+                        <img class="w-full rounded-lg mb-2" src="https://placehold.co/400x200/52c676/000?text=Arm+Balance+and+Inversions" alt="Arm Balance & Inversion Poses">
+                        <p id="yoga-balance-text" class="text-sm text-gray-600 mb-4">
+                            These advanced poses challenge your strength, balance, and focus. They build immense upper body and core strength, while inversions can improve circulation and a fresh perspective.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li>Crane</li>
+                            <li>Crow</li>
+                            <li>Forearm Balance</li>
+                            <li>Handstand</li>
+                            <li>Shoulder Stand</li>
+                        </ul>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+        <!-- Basic Medicine Information Page -->
+        <div id="basic-medicine-page" class="flex-1 flex-col transition-opacity duration-500 ease-in-out opacity-0 absolute inset-0 hidden">
+            <header class="bg-white p-4 border-b border-gray-200 flex items-center shadow-sm rounded-t-2xl">
+                <button id="back-from-medicine-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path fill-rule="evenodd" d="M11.72 2.72a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06L13.5 6.06v12.44a.75.75 0 01-1.5 0V6.06L5.28 11.28a.75.75 0 01-1.06-1.06l7.5-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div class="flex-1 text-center">
+                    <h1 id="medicine-title" class="text-xl font-bold text-gray-800">Basic Medicine Information</h1>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="space-y-8">
+                    <div>
+                        <h2 id="pain-relievers-title" class="text-lg font-bold text-gray-800 mb-2">Pain Relievers (Analgesics)</h2>
+                        <p id="pain-relievers-text" class="text-sm text-gray-600 mb-4">
+                            Pain relievers are used to reduce or relieve headaches, muscle aches, toothaches, and other forms of pain.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li id="pain-relievers-item-1">**Acetaminophen (Tylenol):** Reduces pain and fever. Safe for most people when taken as directed.</li>
+                            <li id="pain-relievers-item-2">**Ibuprofen (Advil, Motrin):** A non-steroidal anti-inflammatory drug (NSAID) that reduces pain, fever, and inflammation.</li>
+                            <li id="pain-relievers-item-3">**Aspirin:** Reduces pain and fever, and inflammation. Not recommended for children due to the risk of Reye's syndrome.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="antacids-title" class="text-lg font-bold text-gray-800 mb-2">Antacids</h2>
+                        <p id="antacids-text" class="text-sm text-gray-600 mb-4">
+                            Antacids are used to relieve heartburn, indigestion, and upset stomach by neutralizing stomach acid.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li id="antacids-item-1">**Calcium Carbonate (Tums):** Fast-acting, but can cause constipation.</li>
+                            <li id="antacids-item-2">**Magnesium Hydroxide (Milk of Magnesia):** Can have a laxative effect.</li>
+                            <li id="antacids-item-3">**Bismuth Subsalicylate (Pepto-Bismol):** Used for heartburn, indigestion, and diarrhea.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="cold-flu-title" class="text-lg font-bold text-gray-800 mb-2">Cold and Flu Medications</h2>
+                        <p id="cold-flu-text" class="text-sm text-gray-600 mb-4">
+                            These medicines help manage symptoms of the common cold or flu, such as cough, congestion, and sore throat.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li id="cold-flu-item-1">**Cough Suppressants (Dextromethorphan):** Helps stop or reduce coughing.</li>
+                            <li id="cold-flu-item-2">**Decongestants (Pseudoephedrine):** Relieves nasal and sinus congestion.</li>
+                            <li id="cold-flu-item-3">**Expectorants (Guaifenesin):** Thins mucus to make coughing more productive.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 id="allergy-title" class="text-lg font-bold text-gray-800 mb-2">Allergy Medications (Antihistamines)</h2>
+                        <p id="allergy-text" class="text-sm text-gray-600 mb-4">
+                            Antihistamines are used to treat symptoms of allergies, such as sneezing, itching, and a runny nose.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li id="allergy-item-1">**Diphenhydramine (Benadryl):** Causes drowsiness, best for nighttime use.</li>
+                            <li id="allergy-item-2">**Loratadine (Claritin):** Non-drowsy option for daytime relief.</li>
+                            <li id="allergy-item-3">**Cetirizine (Zyrtec):** Non-drowsy and fast-acting.</li>
+                        </ul>
+                    </div>
+                    <!-- NEW AYURVEDIC SECTION -->
+                    <div>
+                        <h2 id="home-remedies-title" class="text-lg font-bold text-gray-800 mb-2">Home Remedies (Ayurvedic/Natural)</h2>
+                        <p id="home-remedies-text" class="text-sm text-gray-600 mb-4">
+                            Traditional remedies using common kitchen ingredients for relief from mild symptoms.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 space-y-1">
+                            <li id="home-remedies-item-1">**Sore Throat:** Gargle with warm water mixed with a pinch of salt and **Turmeric**.</li>
+                            <li id="home-remedies-item-2">**Cough Relief:** Chew on a small piece of fresh **Ginger** mixed with honey.</li>
+                            <li id="home-remedies-item-3">**Indigestion:** Drink warm water with **Lemon juice** and a pinch of **Asafoetida (Hing)**.</li>
+                            <li id="home-remedies-item-4">**Immunity:** Drink **Tulsi (Holy Basil)** tea or chew 4-5 fresh leaves daily.</li>
+                        </ul>
+                    </div>
+                    <!-- END NEW AYURVEDIC SECTION -->
+                </div>
+            </main>
+        </div>
+
+
+    </div>
+    
+    <!-- Modal for Alerts -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-content">
+            <p id="modal-text" class="text-gray-800 text-lg font-medium mb-4"></p>
+            <button id="modal-close-btn" class="bg-teal-500 text-white px-4 py-2 rounded-full hover:bg-teal-600">Close</button>
+        </div>
+    </div>
+
+
+    <script>
+        const getStartedBtn = document.getElementById('get-started-btn');
+        const chatbotBtn = document.getElementById('chatbot-btn');
+        const awarenessBtn = document.getElementById('awareness-btn');
+        const videoCallBtn = document.getElementById('video-call-btn');
+
+        const backFromLanguageBtn = document.getElementById('back-from-language-btn');
+        const backFromUserInfoBtn = document.getElementById('back-from-user-info-btn');
+        const backFromModeBtn = document.getElementById('back-from-mode-btn');
+        const menuBtn = document.getElementById('menu-btn');
+        
+        const profileMenuItem = document.getElementById('profile-menu-item');
+        const historyMenuItem = document.getElementById('history-menu-item');
+        const yogaMenuItem = document.getElementById('yoga-menu-item');
+        const basicMedicineMenuItem = document.getElementById('basic-medicine-menu-item');
+        const logoutMenuItem = document.getElementById('logout-menu-item');
+
+        const backToModeBtnFromChat = document.getElementById('back-to-mode-btn-from-chat');
+        const backToChatBtn = document.getElementById('back-to-chat-btn');
+        const backFromHistoryBtn = document.getElementById('back-from-history-btn');
+        const backFromYogaBtn = document.getElementById('back-from-yoga-btn');
+        const backFromMedicineBtn = document.getElementById('back-from-medicine-btn');
+        const backToModeBtnFromAwareness = document.getElementById('back-to-mode-btn-from-awareness');
+        const backFromVideoCallBtn = document.getElementById('back-from-video-call-btn');
+
+
+        const landingPage = document.getElementById('landing-page');
+        const languagePage = document.getElementById('language-page');
+        const userInfoPage = document.getElementById('user-info-page');
+        const modeSelectionPage = document.getElementById('mode-selection-page');
+        const chatPage = document.getElementById('chat-page');
+        const awarenessPage = document.getElementById('awareness-page');
+        const videoCallPage = document.getElementById('video-call-page');
+        const profilePage = document.getElementById('profile-page');
+        const historyPage = document.getElementById('history-page');
+        const yogaPage = document.getElementById('yoga-page');
+        const basicMedicinePage = document.getElementById('basic-medicine-page');
+
+
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const chatHistory = document.querySelector('.chat-history');
+        const menuDropdown = document.getElementById('menu-dropdown');
+        
+        const langEnBtn = document.getElementById('lang-en');
+        const langHiBtn = document.getElementById('lang-hi');
+        const langMrBtn = document.getElementById('lang-mr');
+        const langBnBtn = document.getElementById('lang-bn');
+        const langTaBtn = document.getElementById('lang-ta');
+        const langTeBtn = document.getElementById('lang-te');
+        const langKnBtn = document.getElementById('lang-kn');
+        const langMlBtn = document.getElementById('lang-ml');
+        const langGuBtn = document.getElementById('lang-gu');
+        const langPaBtn = document.getElementById('lang-pa');
+        const langOrBtn = document.getElementById('lang-or');
+
+
+        const modal = document.getElementById('custom-modal');
+        const modalText = document.getElementById('modal-text');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        const preDefinedPrompts = {
+            'en-US': [
+                { text: 'I have a persistent cough and sore throat.', prompt: 'I have a persistent cough and sore throat.' },
+                { text: 'What are some common causes of headaches?', prompt: 'What are some common causes of headaches?' },
+                { text: 'My stomach hurts after eating.', prompt: 'My stomach hurts after eating.' }
+            ],
+            'hi-IN': [
+                { text: 'मुझे लगातार खांसी और गले में खराश है।', prompt: 'मुझे लगातार खांसी और गले में खराश है।' },
+                { text: 'सिरदर्द के कुछ सामान्य कारण क्या हैं?', prompt: 'सिरदर्द के कुछ सामान्य कारण क्या हैं?' },
+                { text: 'खाने के बाद मेरे पेट में दर्द होता है।', prompt: 'खाने के बाद मेरे पेट में दर्द होता है।' }
+            ],
+            'mr-IN': [
+                { text: 'मला सतत खोकला आणि घसा खवखवत आहे।', prompt: 'मला सतत खोकला आणि घसा खवखवत आहे।' },
+                { text: 'डोकेदुखीची काही सामान्य कारणे कोणती आहेत?', prompt: 'डोकेदुखीची काही सामान्य कारणे कोणती आहेत?' },
+                { text: 'जेवणानंतर माझे पोट दुखते.', prompt: 'जेवणानंतर माझे पोट दुखते।' }
+            ],
+            'bn-IN': [
+                { text: 'আমার ক্রমাগত কাশি এবং গলা ব্যথা আছে।', prompt: 'আমার ক্রমাগত কাশি এবং গলা ব্যথা আছে.' },
+                { text: 'মাথাব্যথার কিছু সাধারণ কারণ কী?', prompt: 'মাথাব্যথার কিছু সাধারণ কারণ কী?' },
+                { text: 'খাওয়ার পর আমার পেট ব্যথা করে।', prompt: 'খাওয়ার পর আমার পেট ব্যথা করে.' }
+            ],
+            'ta-IN': [
+                { text: 'எனக்கு தொடர்ந்து இருமல் மற்றும் தொண்டை புண் உள்ளது.', prompt: 'எனக்கு தொடர்ந்து இருமல் மற்றும் தொண்டை புண் உள்ளது.' },
+                { text: 'தலைவலிக்கான சில பொதுவான காரணங்கள் யாவை?', prompt: 'தலைவலிக்கான சில பொதுவான காரணங்கள் யாவை?' },
+                { text: 'சாப்பிட்ட பிறகு என் வயிறு வலிக்கிறது.', prompt: 'சாப்பிட்ட பிறகு என் வயிறு வலிக்கிறது.' }
+            ],
+            'te-IN': [
+                { text: 'నాకు నిరంతరం దగ్గు మరియు గొంతు నొప్పి ఉంది.', prompt: 'నాకు నిరంతరం దగ్గు మరియు గొంతు నొప్పి ఉంది।' },
+                { text: 'తలనొప్పికి కొన్ని సాధారణ కారణాలు ఏమిటి?', prompt: 'తలనొప్పికి కొన్ని సాధారణ కారణాలు ఏమిటి?' },
+                { text: 'తిన్న తర్వాత నా కడుపు నొప్పిగా ఉంది.', prompt: 'తిన్న తర్వాత నా కడుపు నొప్పిగా ఉంది।' }
+            ],
+            'kn-IN': [
+                { text: 'ನನಗೆ ನಿರಂತರ ಕೆಮ್ಮು ಮತ್ತು ಗಂಟಲು ನೋವಿದೆ.', prompt: 'ನನಗೆ ನಿರಂತರ ಕೆಮ್ಮು ಮತ್ತು ಗಂಟಲು ನೋವಿದೆ।' },
+                { text: 'ತಲೆನೋವಿಗೆ ಕೆಲವು ಸಾಮಾನ್ಯ ಕಾರಣಗಳೇನು?', prompt: 'ತಲೆನೋವಿಗೆ ಕೆಲವು ಸಾಮಾನ್ಯ ಕಾರಣಗಳೇನು?' },
+                { text: 'ಊಟದ ನಂತರ ನನ್ನ ಹೊಟ್ಟೆ ನೋವುತ್ತದೆ.', prompt: 'ಊಟದ ನಂತರ ನನ್ನ ಹೊಟ್ಟೆ ನೋವುತ್ತದೆ।' }
+            ],
+            'ml-IN': [
+                { text: 'എനിക്ക് സ്ഥിരമായി ചുമയും തൊണ്ടവേദനയുമുണ്ട്.', prompt: 'എനിക്ക് സ്ഥിരമായി ചുമയും തൊണ്ടവേദനയുമുണ്ട്।' },
+                { text: 'തലവേദനയുടെ ചില സാധാരണ കാരണങ്ങൾ എന്തൊക്കെയാണ്?', prompt: 'തലവേദനയുടെ ചില സാധാരണ കാരണങ്ങൾ എന്തൊക്കെയാണ്?' },
+                { text: 'ഭക്ഷണം കഴിച്ചതിന് ശേഷം എൻ്റെ വയറു വേദനിക്കുന്നു.', prompt: 'ഭക്ഷണം കഴിച്ചതിന് ശേഷം എൻ്റെ വയറു വേദനിക്കുന്നു।' }
+            ],
+            'gu-IN': [
+                { text: 'મને સતત ઉધરસ અને ગળામાં દુખાવો રહે છે।', prompt: 'મને સતત ઉધરસ અને ગળામાં દુખાવો રહે છે।' },
+                { text: 'માથાનો દુખાવો થવાના કેટલાક સામાન્ય કારણો શું છે?', prompt: 'માથાનો દુખાવો થવાના કેટલાક સામાન્ય કારણો શું છે?' },
+                { text: 'જમ્યા પછી મારું પેટ દુખે છે.', prompt: 'જમ્યા પછી મારું પેટ દુખે છે।' }
+            ],
+            'pa-IN': [
+                { text: 'ਮੈਨੂੰ ਲਗਾਤਾਰ ਖੰਘ ਅਤੇ ਗਲੇ ਵਿੱਚ ਖਰਾਸ਼ ਹੈ।', prompt: 'ਮੈਨੂੰ ਲਗਾਤਾਰ ਖੰਘ ਅਤੇ ਗਲੇ ਵਿੱਚ ਖਰਾਸ਼ ਹੈ।' },
+                { text: 'ਸਿਰ ਦਰਦ ਦੇ ਕੁਝ ਆਮ ਕਾਰਨ ਕੀ ਹਨ?', prompt: 'ਸਿਰ ਦਰਦ ਦੇ ਕੁਝ ਆਮ ਕਾਰਨ ਕੀ ਹਨ?' },
+                { text: 'ਖਾਣਾ ਖਾਣ ਤੋਂ ਬਾਅਦ ਮੇਰਾ ਪੇਟ ਦਰਦ ਹੁੰਦਾ ਹੈ।', prompt: 'ਖਾਣਾ ਖਾਣ ਤੋਂ ਬਾਅਦ ਮੇਰਾ ਪੇਟ ਦਰਦ ਹੁੰਦਾ ਹੈ।' }
+            ],
+            'or-IN': [
+                { text: 'ମୋର କ୍ରମାଗତ କାଶ ଏବଂ ଗଳା ଯନ୍ତ୍ରଣା ହେଉଛି |', prompt: 'ମୋର କ୍ରମାଗତ କାଶ ଏବଂ ଗଳା ଯନ୍ତ୍ରଣା ହେଉଛି |' },
+                { text: 'ମୁଣ୍ଡବିନ୍ଧାର କିଛି ସାଧାରଣ କାରଣ କ’ଣ?', prompt: 'ମୁଣ୍ଡବିନ୍ଧାର କିଛି ସାଧାରଣ କାରଣ କ’ଣ?' },
+                { text: 'ଖାଇବା ପରେ ମୋର ପେଟ ବ୍ୟଥା ହୁଏ |', prompt: 'ଖାଇବା ପରେ ମୋର ପେଟ ବ୍ୟଥା ହୁଏ |' }
+            ]
+        };
+        
+        const translations = {
+            'en-US': {
+                'user-info-title': 'Provide Your Details',
+                'gender-label': 'Gender',
+                'gender-option-male': 'Male',
+                'gender-option-female': 'Female',
+                'gender-option-other': 'Other',
+                'age-label': 'Age',
+                'age-input-placeholder': 'Enter your age',
+                'diseases-label': 'Any pre-existing diseases (e.g., BP, diabetes)',
+                'diseases-input-placeholder': 'Enter diseases (optional)',
+                'submit-user-info-btn': 'Continue',
+                'chat-welcome-message': "Hello! I'm your personal health assistant. Describe your symptoms or concerns, and I'll do my best to provide information and guidance. How can I help you today?",
+                'chat-input-placeholder': 'Describe your symptoms...',
+                'chat-thinking-message': 'Typing...',
+                'menu-profile': 'Profile',
+                'menu-history': 'History',
+                'menu-yoga': 'Yoga Information',
+                'menu-medicine': 'Basic Medicine Information',
+                'menu-logout': 'Logout',
+                'profile-title': 'Profile',
+                'profile-verify-info-title': 'Verify your information',
+                'profile-verify-info-text': 'Verify your mobile number to securely access and save your chat history.',
+                'profile-mobile-placeholder': 'Enter mobile number',
+                'profile-send-otp-btn': 'Send OTP',
+                'profile-or-text': 'or',
+                'profile-google-signin': 'Sign in with Google',
+                'history-title': 'History',
+                'history-content': 'Your chat history will appear here once you\'ve signed in.',
+                'yoga-title': 'Yoga Information',
+                'yoga-standing-title': 'Standing Poses',
+                'yoga-standing-text': 'Standing poses are foundational to yoga practice, helping to build strength, balance, and stability throughout the body. They engage the legs, core, and back muscles to create a strong base, while also improving posture and alignment.',
+                'yoga-seated-title': 'Seated Poses',
+                'yoga-seated-text': 'Seated poses are excellent for increasing flexibility in the hips, hamstrings, and groin. They promote a sense of calm and grounding, making them perfect for meditation and deep stretching.',
+                'yoga-supine-title': 'Supine Poses',
+                'yoga-supine-text': 'Supine poses, performed lying on your back, are ideal for relaxation and gentle stretching. They can help release tension from the spine and hips, calm the nervous system, and prepare the body for rest.',
+                'yoga-prone-title': 'Prone Poses',
+                'yoga-prone-text': 'Prone poses are done lying on your stomach and are great for strengthening the back muscles and opening the chest. They can also help relieve back pain and improve spinal flexibility.',
+                'yoga-support-title': 'Arm & Leg Support Poses',
+                'yoga-support-text': 'These poses require you to bear weight on your arms or legs, building significant strength in your limbs and core. They are excellent for developing balance, stability, and full-body control.',
+                'yoga-balance-title': 'Arm Balance & Inversion Poses',
+                'yoga-balance-text': 'These advanced poses challenge your strength, balance, and focus. They build immense upper body and core strength, while inversions can improve circulation and a fresh perspective.',
+                'medicine-title': 'Basic Medicine Information',
+                'medicine-pain-relievers-title': 'Pain Relievers (Analgesics)',
+                'medicine-pain-relievers-text': 'Pain relievers are used to reduce or relieve headaches, muscle aches, toothaches, and other forms of pain.',
+                'medicine-pain-relievers-item-1': '**Acetaminophen (Tylenol):** Reduces pain and fever. Safe for most people when taken as directed.',
+                'medicine-pain-relievers-item-2': '**Ibuprofen (Advil, Motrin):** A non-steroidal anti-inflammatory drug (NSAID) that reduces pain, fever, and inflammation.',
+                'medicine-pain-relievers-item-3': '**Aspirin:** Reduces pain and fever, and inflammation. Not recommended for children due to the risk of Reye\'s syndrome.',
+                'medicine-antacids-title': 'Antacids',
+                'medicine-antacids-text': 'Antacids are used to relieve heartburn, indigestion, and upset stomach by neutralizing stomach acid.',
+                'medicine-antacids-item-1': '**Calcium Carbonate (Tums):** Fast-acting, but can cause constipation.',
+                'medicine-antacids-item-2': '**Magnesium Hydroxide (Milk of Magnesia):** Can have a laxative effect.',
+                'medicine-antacids-item-3': '**Bismuth Subsalicylate (Pepto-Bismol):** Used for heartburn, indigestion, and diarrhea.',
+                'medicine-cold-flu-title': 'Cold and Flu Medications',
+                'medicine-cold-flu-text': 'These medicines help manage symptoms of the common cold or flu, such as cough, congestion, and sore throat.',
+                'medicine-cold-flu-item-1': '**Cough Suppressants (Dextromethorphan):** Helps stop or reduce coughing.',
+                'medicine-cold-flu-item-2': '**Decongestants (Pseudoephedrine):** Relieves nasal and sinus congestion.',
+                'medicine-cold-flu-item-3': '**Expectorants (Guaifenesin):** Thins mucus to make coughing more productive.',
+                'medicine-allergy-title': 'Allergy Medications (Antihistamines)',
+                'medicine-allergy-text': 'Antihistamines are used to treat symptoms of allergies, such as sneezing, itching, and a runny nose.',
+                'medicine-allergy-item-1': '**Diphenhydramine (Benadryl):** Causes drowsiness, best for nighttime use.',
+                'medicine-allergy-item-2': '**Loratadine (Claritin):** Non-drowsy option for daytime relief.',
+                'medicine-allergy-item-3': '**Cetirizine (Zyrtec):** Non-drowsy and fast-acting.',
+                'home-remedies-title': 'Home Remedies (Ayurvedic/Natural)',
+                'home-remedies-text': 'Traditional remedies using common kitchen ingredients for relief from mild symptoms.',
+                'home-remedies-item-1': '**Sore Throat:** Gargle with warm water mixed with a pinch of salt and **Turmeric**.',
+                'home-remedies-item-2': '**Cough Relief:** Chew on a small piece of fresh **Ginger** mixed with honey.',
+                'home-remedies-item-3': '**Indigestion:** Drink warm water with **Lemon juice** and a pinch of **Asafoetida (Hing)**.',
+                'home-remedies-item-4': '**Immunity:** Drink **Tulsi (Holy Basil)** tea or chew 4-5 fresh leaves daily.',
+                'video-call-title': 'AI Video Call',
+                'modal-logout': 'You have been logged out.',
+                'modal-invalid-age': 'Please enter a valid age.',
+                'video-log-text': 'Tap the screen to begin your voice consultation.',
+                'video-tap-prompt': 'Tap anywhere on the screen to start speaking.'
+            },
+            'hi-IN': {
+                'user-info-title': 'अपनी जानकारी प्रदान करें',
+                'gender-label': 'लिंग',
+                'gender-option-male': 'पुरुष',
+                'gender-option-female': 'महिला',
+                'gender-option-other': 'अन्य',
+                'age-label': 'आयु',
+                'age-input-placeholder': 'अपनी आयु दर्ज करें',
+                'diseases-label': 'कोई भी मौजूदा रोग (जैसे बीपी, मधुमेह)',
+                'diseases-input-placeholder': 'रोग दर्ज करें (वैकल्पिक)',
+                'submit-user-info-btn': 'जारी रखें',
+                'chat-welcome-message': 'नमस्ते! मैं आपकी व्यक्तिगत स्वास्थ्य सहायक हूं। मुझे अपने लक्षणों या चिंताओं के बारे में बताएं, और मैं आपको जानकारी और मार्गदर्शन प्रदान करने की पूरी कोशिश करूंगी। मैं आज आपकी कैसे मदद कर सकती हूं?',
+                'chat-input-placeholder': 'अपने लक्षण बताएं...',
+                'chat-thinking-message': 'टाइपिंग...',
+                'menu-profile': 'प्रोफ़ाइल',
+                'menu-history': 'इतिहास',
+                'menu-yoga': 'योग की जानकारी',
+                'menu-medicine': 'मूलभूत दवा की जानकारी',
+                'menu-logout': 'लॉग आउट',
+                'profile-title': 'प्रोफ़ाइल',
+                'profile-verify-info-title': 'अपनी जानकारी सत्यापित करें',
+                'profile-verify-info-text': 'अपनी चैट का इतिहास सुरक्षित रूप से एक्सेस और सेव करने के लिए अपना मोबाइल नंबर सत्यापित करें।',
+                'profile-mobile-placeholder': 'मोबाइल नंबर दर्ज करें',
+                'profile-send-otp-btn': 'ओटीपी भेजें',
+                'profile-or-text': 'या',
+                'profile-google-signin': 'गूगल से साइन इन करें',
+                'history-title': 'इतिहास',
+                'history-content': 'साइन इन करने के बाद आपकी चैट का इतिहास यहां दिखेगा।',
+                'yoga-title': 'योग की जानकारी',
+                'yoga-standing-title': 'खड़े होने वाले आसन',
+                'yoga-standing-text': 'खड़े होने वाले आसन योग अभ्यास की नींव हैं, जो पूरे शरीर में शक्ति, संतुलन और स्थिरता बनाने में मदद करते हैं। वे एक मजबूत आधार बनाने के लिए पैरों, कोर और पीठ की मांसपेशियों को संलग्न करते हैं, जबकि आसन और संरेखण में भी सुधार करते हैं।',
+                'yoga-seated-title': 'बैठने वाले आसन',
+                'yoga-seated-text': 'बैठने वाले आसन कूल्हों, हैमस्ट्रिंग और कमर में लचीलापन बढ़ाने के लिए उत्कृष्ट हैं। वे शांति और स्थिरता की भावना को बढ़ावा देते हैं, जिससे वे ध्यान और गहरी स्ट्रेचिंग के लिए एकदम सही होते हैं।',
+                'yoga-supine-title': 'सुपाइन पोज़',
+                'yoga-supine-text': 'सुपाइन पोज़, जो आपकी पीठ के बल लेटकर किए जाते हैं, विश्राम और कोमल स्ट्रेचिंग के लिए आदर्श हैं। वे रीढ़ और कूल्हों से तनाव मुक्त करने, तंत्रिका तंत्र को शांत करने और शरीर को आराम के लिए तैयार करने में मदद कर सकते हैं।',
+                'yoga-prone-title': 'प्रोन पोज़',
+                'yoga-prone-text': 'प्रोन पोज़ पेट के बल लेटकर किए जाते हैं और पीठ की मांसपेशियों को मजबूत करने और छाती को खोलने के लिए बहुत अच्छे होते हैं। वे पीठ दर्द को कम करने और रीढ़ की लचीलापन में सुधार करने में भी मदद कर सकते हैं।',
+                'yoga-support-title': 'हाथ और पैर के सहारे वाले आसन',
+                'yoga-support-text': 'इन पोज़ के लिए आपको अपने हाथों या पैरों पर वजन डालना पड़ता है, जिससे आपके अंगों और कोर में महत्वपूर्ण शक्ति बनती है। वे संतुलन, स्थिरता और पूरे शरीर पर नियंत्रण विकसित करने के लिए उत्कृष्ट हैं।',
+                'yoga-balance-title': 'आर्म बैलेंस और इनवर्शन पोज',
+                'yoga-balance-text': 'ये उन्नत पोज़ आपकी शक्ति, संतुलन और ध्यान को चुनौती देते हैं। वे ऊपरी शरीर और कोर की जबरदस्त शक्ति का निर्माण करते हैं, जबकि इनवर्शन परिसंचरण और एक ताज़ा दृष्टिकोण में सुधार कर सकते हैं।',
+                'medicine-title': 'मूलभूत दवा की जानकारी',
+                'medicine-pain-relievers-title': 'दर्द निवारक (एनाल्जेसिक)',
+                'medicine-pain-relievers-text': 'दर्द निवारक का उपयोग सिरदर्द, मांसपेशियों में दर्द, दांत दर्द और अन्य प्रकार के दर्द को कम करने या राहत देने के लिए किया जाता है।',
+                'medicine-pain-relievers-item-1': '**एसिटामिनोफेन (टायलेनॉल):** वेदना और बुखार को कम करता है। निर्देशानुसार लेने पर अधिकांश लोगों के लिए सुरक्षित।',
+                'medicine-pain-relievers-item-2': '**इबुप्रोफेन (एडविल, मोट्रिन):** एक गैर-स्टेरायडल एंटी-इन्फ्लेमेटरी दवा (NSAID) जो वेदना, बुखार और सूजन को कम करती है।',
+                'medicine-pain-relievers-item-3': '**एस्पिरिन:** वेदना, बुखार और सूजन को कम करता है। रेये के सिंड्रोम के जोखिम के कारण बच्चों के लिए अनुशंसित नहीं है।',
+                'medicine-antacids-title': 'एंटासिड',
+                'medicine-antacids-text': 'एंटासिड का उपयोग पेट के एसिड को बेअसर करके एसिडिटी, अपचन और पेट खराब होने से राहत देने के लिए किया जाता है।',
+                'medicine-antacids-item-1': '**कैल्शियम कार्बोनेट (टम्स):** तेजी से काम करता है, लेकिन कब्ज का कारण बन सकता है।',
+                'medicine-antacids-item-2': '**मॅग्नेशियम हाइड्रॉक्साईड (मिल्क ऑफ मॅग्नेशिया):** इसका रेचक प्रभाव हो सकता है।',
+                'medicine-antacids-item-3': '**बिस्मथ सबसॅलिसिलेट (पेप्टो-बिस्मोल):** एसिडिटी, अपचन और दस्त के लिए उपयोग किया जाता है।',
+                'medicine-cold-flu-title': 'सर्दी और फ्लू की दवाएं',
+                'medicine-cold-flu-text': 'ये दवाएं खांसी, भीड़ और गले में खराश जैसे सामान्य सर्दी या फ्लू के लक्षणों को प्रबंधित करने में मदद करती हैं।',
+                'medicine-cold-flu-item-1': '**कफ सप्रेसंट्स (डेक्सट्रोमेथॉर्फन):** खांसी को रोकने या कम करने में मदद करता है।',
+                'medicine-cold-flu-item-2': '**डिकंजेस्टंट्स (स्यूडोएफेड्रिन):** नाक और साइनस की भीड़ से राहत दिलाता है।',
+                'medicine-cold-flu-item-3': '**एक्सपेक्टोरंट्स (गुआइफेनेसिन):** खांसी को अधिक प्रभावी बनाने के लिए बलगम को पतला करता है।',
+                'medicine-allergy-title': 'एलर्जी की दवाएं (एंटीहिस्टामाइन)',
+                'medicine-allergy-text': 'एंटीहिस्टामाइन का उपयोग एलर्जी के लक्षणों के इलाज के लिए किया जाता है, जैसे कि छींकना, खुजली और बहती नाक।',
+                'medicine-allergy-item-1': '**डिफेनहाइड्रामीन (बेनाड्रिल):** तंद्रा का कारण बनता है, रात के उपयोग के लिए सबसे अच्छा है।',
+                'medicine-allergy-item-2': '**लोराटॅडिन (क्लैरिटिन):** दिन के आराम के लिए गैर-तंद्रा वाला विकल्प।',
+                'medicine-allergy-item-3': '**सेटिरिझिन (झिर्टेक):** गैर-तंद्रा वाला और तेजी से काम करने वाला।',
+                'home-remedies-title': 'घरेलू उपचार (आयुर्वेदिक/प्राकृतिक)',
+                'home-remedies-text': 'हल्के लक्षणों से राहत के लिए सामान्य रसोई सामग्री का उपयोग करके पारंपरिक उपचार।',
+                'home-remedies-item-1': '**गले में खराश:** गरम पानी में एक चुटकी नमक और **हल्दी** मिलाकर गरारे करें।',
+                'home-remedies-item-2': '**खांसी से राहत:** शहद के साथ मिश्रित ताजे **अदरक** का एक छोटा टुकड़ा चबाएं।',
+                'home-remedies-item-3': '**अपच:** **नींबू का रस** और एक चुटकी **हींग** मिला हुआ गर्म पानी पीएँ।',
+                'home-remedies-item-4': '**रोग प्रतिरोधक क्षमता:** **तुलसी** की चाय पिएं या रोजाना 4-5 ताजी पत्तियां चबाएं।',
+                'video-call-title': 'एआई वीडियो कॉल',
+                'modal-logout': 'आप लॉग आउट हो चुके हैं।',
+                'modal-invalid-age': 'कृपया एक वैध आयु दर्ज करें।',
+                'video-log-text': 'स्क्रीन पर टैप करके अपनी वॉइस परामर्श शुरू करें।',
+                'video-tap-prompt': 'बोलना शुरू करने के लिए स्क्रीन पर कहीं भी टैप करें।'
+            },
+            'mr-IN': {
+                'user-info-title': 'तुमची माहिती द्या',
+                'gender-label': 'लिंग',
+                'gender-option-male': 'पुरुष',
+                'gender-option-female': 'महिला',
+                'gender-option-other': 'इतर',
+                'age-label': 'वय',
+                'age-input-placeholder': 'तुमचे वय प्रविष्ट करा',
+                'diseases-label': 'कोणतेही विद्यमान रोग (उदा. बीपी, मधुमेह)',
+                'diseases-input-placeholder': 'रोग प्रविष्ट करा (पर्यायी)',
+                'submit-user-info-btn': 'पुढे चालू ठेवा',
+                'chat-welcome-message': 'नमस्कार! मी तुमची वैयक्तिक आरोग्य सहाय्यक आहे। मला तुमच्या लक्षणांबद्दल किंवा चिंतेबद्दल सांगा, आणि मी तुम्हाला माहिती आणि मार्गदर्शन देण्याचा प्रयत्न करेन। मी आज तुम्हाला कशी मदत करू शकेन?',
+                'chat-input-placeholder': 'तुमची लक्षणे सांगा...',
+                'chat-thinking-message': 'टाईप करत आहे...',
+                'menu-profile': 'प्रोफाइल',
+                'menu-history': 'इतिहास',
+                'menu-yoga': 'योगाची माहिती',
+                'menu-medicine': 'मूलभूत औषधांची माहिती',
+                'menu-logout': 'लॉग आउट',
+                'profile-title': 'प्रोफाइल',
+                'profile-verify-info-title': 'तुमची माहिती सत्यापित करा',
+                'profile-verify-info-text': 'तुमच्या चॅटचा इतिहास सुरक्षितपणे ॲक्सेस आणि सेव्ह करण्यासाठी तुमचा मोबाईल नंबर सत्यापित करा.',
+                'profile-mobile-placeholder': 'मोबाईल नंबर प्रविष्ट करा',
+                'profile-send-otp-btn': 'ओटीपी पाठवा',
+                'profile-or-text': 'किंवा',
+                'profile-google-signin': 'Google सह साइन इन करा',
+                'history-title': 'इतिहास',
+                'history-content': 'साइन इन केल्यानंतर तुमचा चॅट इतिहास येथे दिसेल.',
+                'yoga-title': 'योगाची माहिती',
+                'yoga-standing-title': 'उभे राहून करायची योगासने',
+                'yoga-standing-text': 'उभे राहून करायची योगासने योगाच्या अभ्यासाचा पाया आहेत, ज्यामुळे संपूर्ण शरीरात ताकद, संतुलन आणि स्थिरता निर्माण होते. ते एक मजबूत आधार तयार करण्यासाठी पाय, कोर आणि पाठीच्या स्नायूंना गुंतवतात, तसेच पवित्रा आणि संरेखण सुधारतात।',
+                'yoga-seated-title': 'बसून करायची योगासने',
+                'yoga-seated-text': 'बसून करायची योगासने कूल्हे, हॅमस्ट्रिंग आणि कमर मध्ये लवचिकता वाढवण्यासाठी उत्कृष्ट आहेत. ते शांतता आणि जमिनीवर असल्याची भावना वाढवतात, ज्यामुळे ते ध्यान आणि गहरी स्ट्रेचिंगसाठी योग्य ठरतात.',
+                'yoga-supine-title': 'सुपाइन पोझ',
+                'yoga-supine-text': 'तुमच्या पाठीवर झोपून केलेली सुपाइन पोझ, विश्रांती आणि हळूवार स्ट्रेचिंगसाठी आदर्श आहेत। ते पाठीच्या मणक्यातील आणि कूल्ह्यातील ताण कमी करण्यास, मज्जासंस्थेला शांत करण्यास आणि शरीराला विश्रांतीसाठी तयार करण्यास मदत करू शकतात.',
+                'yoga-prone-title': 'प्रोन पोझ',
+                'yoga-prone-text': 'प्रोन पोझ पोटावर झोपून केली जातात आणि पीठच्या स्नायूंना मजबूत करण्यासाठी आणि छाती उघडण्यासाठी खूप चांगले असतात। ते पाठदुखी कमी करण्यास आणि पाठीच्या कण्याचे लवचिकता सुधारण्यास मदत करू शकतात.',
+                'yoga-support-title': 'हातावर आणि पायावर आधारलेली योगासने',
+                'yoga-support-text': 'या आसनांमध्ये तुम्हाला तुमचे वजन हातांवर किंवा पायांवर टाकावे लागते, ज्यामुळे तुमच्या अवयवांमध्ये आणि कोरमध्ये लक्षणीय ताकद निर्माण होते. संतुलन, स्थिरता आणि संपूर्ण शरीर नियंत्रण विकसित करण्यासाठी ते उत्कृष्ट आहेत।',
+                'yoga-balance-title': 'आर्म बॅलन्स आणि इन्वर्शन पोझ',
+                'yoga-balance-text': 'ही प्रगत योगासने तुमची ताकद, संतुलन आणि लक्ष केंद्रित करण्याची क्षमता यांना आव्हान देतात. ते अप्पर बॉडी आणि कोरमध्ये प्रचंड ताकद निर्माण करतात, तर इन्वर्शन रक्तभिसरण आणि एक नवीन दृष्टीकोन सुधारू शकतात।',
+                'medicine-title': 'मूलभूत औषधांची माहिती',
+                'medicine-pain-relievers-title': 'वेदना कमी करणारी औषधे (अनलजेसिक)',
+                'medicine-pain-relievers-text': 'वेदना कमी करणारी औषधे डोकेदुखी, स्नायूदुखी, दातदुखी आणि इतर प्रकारच्या वेदना कमी करण्यासाठी किंवा आराम देण्यासाठी वापरली जातात.',
+                'medicine-pain-relievers-item-1': '**असेटामिनोफेन (टायलेनॉल):** वेदना आणि ताप कमी करते। निर्देशानुसार घेतल्यास बहुतेक लोकांसाठी सुरक्षित आहे.',
+                'medicine-pain-relievers-item-2': '**इबुप्रोफेन (ऍडविल, मोट्रिन):** एक नॉन-स्टेरॉइडल अँटी-इन्फ्लेमेटरी औषध (NSAID) जे वेदना, ताप आणि सूज कमी करते.',
+                'medicine-pain-relievers-item-3': '**एस्पिरिन:** वेदना, ताप आणि सूज कमी करते. रेये के सिंड्रोमच्या धोक्यामुळे मुलांसाठी शिफारस केलेली नाही.',
+                'medicine-antacids-title': 'एंटासिड',
+                'medicine-antacids-text': 'एंटासिडचा वापर पोटातले ॲसिड तटस्थ करून ॲसिडिटी, अपचन आणि पोट खराब होण्यापासून आराम देण्यासाठी केला जातो.',
+                'medicine-antacids-item-1': '**कॅल्शियम कार्बोनेट (टम्स):** लवकर काम करते, पण बद्धकोष्ठता होऊ शकते.',
+                'medicine-antacids-item-2': '**मॅग्नेशियम हाइड्रॉक्साईड (मिल्क ऑफ मॅग्नेशिया):** याचा रेचक परिणाम होऊ शकतो.',
+                'medicine-antacids-item-3': '**बिस्मथ सबसॅलिसिलेट (पेप्टो-बिस्मोल):** ॲसिडिटी, अपचन आणि जुलाबासाठी वापरले जाते.',
+                'medicine-cold-flu-title': 'सर्दी आणि फ्लूची औषधे',
+                'medicine-cold-flu-text': 'ही औषधे खोकला, नाक बंद होणे आणि घसा खवखवणे यांसारख्या सामान्य सर्दी किंवा फ्लूच्या लक्षणांवर नियंत्रण ठेवण्यास मदत करतात।',
+                'medicine-cold-flu-item-1': '**कफ सप्रेसंट्स (डेक्सट्रोमेथॉर्फन):** खोकला थांबवण्यास किंवा कमी करण्यास मदत करते.',
+                'medicine-cold-flu-item-2': '**डिकंजेस्टंट्स (स्यूडोएफेड्रिन):** नाक आणि सायनस बंद होण्यापासून आराम देते.',
+                'medicine-cold-flu-item-3': '**एक्सपेक्टोरंट्स (गुआइफेनेसिन):** खोकला अधिक प्रभावी होण्यासाठी कफ पातळ करते.',
+                'medicine-allergy-title': 'ऍलर्जीची औषधे (अँटीहिस्टामाइन)',
+                'medicine-allergy-text': 'अँटीहिस्टामाइनचा वापर ऍलर्जीच्या लक्षणांवर उपचार करण्यासाठी केला जातो, जसे की शिंका येणे, खाज येणे आणि नाक वाहणे.',
+                'medicine-allergy-item-1': '**डिफेनहाइड्रामीन (बेनाड्रिल):** यामुळे तंद्री येते, रात्रीच्या वापरासाठी सर्वात चांगले आहे.',
+                'medicine-allergy-item-2': '**लोराटॅडिन (क्लैरिटिन):** दिवसा आराम मिळवण्यासाठी तंद्री न देणारा पर्याय.',
+                'medicine-allergy-item-3': '**सेटिरिझिन (झिर्टेक):** तंद्री न देणारा आणि लवकर काम करणारा.',
+                'home-remedies-title': 'घरगुती उपाय (आयुर्वेदिक/नैसर्गिक)',
+                'home-remedies-text': 'हलक्या लक्षणांपासून आराम मिळवण्यासाठी सामान्य स्वयंपाकघरातील घटकांचा वापर करून पारंपारिक उपाय.',
+                'home-remedies-item-1': '**घसा खवखवणे:** गरम पाण्यात एक चिमूटभर मीठ आणि **हळद** मिसळून गुळण्या करा.',
+                'home-remedies-item-2': '**खोकल्यापासून आराम:** मधासोबत मिसळलेला ताज्या **आल्याचा** एक छोटा तुकडा चघळा.',
+                'home-remedies-item-3': '**अपचन:** **लिंबाचा रस** आणि चिमूटभर **हिंग** मिसळलेले गरम पाणी प्या.',
+                'home-remedies-item-4': '**रोगप्रतिकारशक्ती:** **तुळशीचा** (पवित्र तुळस) चहा प्या किंवा दररोज 4-5 ताजी पाने चघळा.',
+                'video-call-title': 'एआई व्हिडिओ कॉल',
+                'modal-logout': 'तुम्ही लॉग आउट झाला आहात।',
+                'modal-invalid-age': 'कृपया वैध वय प्रविष्ट करा।',
+                'video-log-text': 'स्क्रीनवर टॅप करून तुमचा वॉइस सल्ला सुरू करा.',
+                'video-tap-prompt': 'बोलणे सुरू करण्यासाठी स्क्रीनवर कुठेही टॅप करा।'
+            },
+            'bn-IN': {
+                'user-info-title': 'আপনার বিবরণ প্রদান করুন',
+                'gender-label': 'লিঙ্গ',
+                'gender-option-male': 'পুরুষ',
+                'gender-option-female': 'মহিলা',
+                'gender-option-other': 'অন্যান্য',
+                'age-label': 'বয়স',
+                'age-input-placeholder': 'আপনার বয়স লিখুন',
+                'diseases-label': 'কোনো বিদ্যমান রোগ (যেমন বিপি, ডায়াবেটিস)',
+                'diseases-input-placeholder': 'রোগ লিখুন (ঐচ্ছিক)',
+                'submit-user-info-btn': 'চালিয়ে যান',
+                'chat-welcome-message': 'নমস্কার! আমি আপনার ব্যক্তিগত স্বাস্থ্য সহকারী। আপনার লক্ষণ বা উদ্বেগ বর্ণনা করুন, এবং আমি তথ্য ও নির্দেশনা দেওয়ার জন্য আমার যথাসাধ্য চেষ্টা করব। আমি আজ আপনাকে কিভাবে সাহায্য করতে পারি?',
+                'chat-input-placeholder': 'আপনার লক্ষণ বর্ণনা করুন...',
+                'chat-thinking-message': 'টাইপ করছে...',
+                'menu-profile': 'প্রোফাইল',
+                'menu-history': 'ইতিহাস',
+                'menu-yoga': 'যোগের তথ্য',
+                'menu-medicine': 'মৌলিক ঔষধের তথ্য',
+                'menu-logout': 'লগ আউট',
+                'profile-title': 'প্রোফাইল',
+                'profile-verify-info-title': 'আপনার তথ্য যাচাই করুন',
+                'profile-verify-info-text': 'আপনার চ্যাটের ইতিহাস সুরক্ষিতভাবে অ্যাক্সেস এবং সংরক্ষণ করতে আপনার মোবাইল নম্বর যাচাই করুন।',
+                'profile-mobile-placeholder': 'মোবাইল নম্বর লিখুন',
+                'profile-send-otp-btn': 'ওটিপি পাঠান',
+                'profile-or-text': 'অথবা',
+                'profile-google-signin': 'Google দিয়ে সাইন ইন করুন',
+                'history-title': 'ইতিহাস',
+                'history-content': 'সাইন ইন করার পরে আপনার চ্যাটের ইতিহাস এখানে দেখা যাবে।',
+                'video-call-title': 'এআই ভিডিও কল',
+                'modal-logout': 'আপনি লগ আউট হয়ে গেছেন।',
+                'modal-invalid-age': 'একটি বৈধ বয়স লিখুন।',
+                'video-log-text': 'পরামর্শ শুরু করতে স্ক্রিনে ট্যাপ করুন।',
+                'video-tap-prompt': 'কথা বলা শুরু করতে স্ক্রিনে যেকোনো জায়গায় ট্যাপ করুন।'
+            },
+            'ta-IN': {
+                'user-info-title': 'உங்கள் விவரங்களை வழங்கவும்',
+                'gender-label': 'பாலினம்',
+                'gender-option-male': 'ஆண்',
+                'gender-option-female': 'பெண்',
+                'gender-option-other': 'மற்றவை',
+                'age-label': 'வயது',
+                'age-input-placeholder': 'உங்கள் வயதை உள்ளிடவும்',
+                'diseases-label': 'ஏதேனும் முன்பே இருக்கும் நோய்கள் (எ.கா., பிபி, நீரிழிவு)',
+                'diseases-input-placeholder': 'நோய்களை உள்ளிடவும் (விரும்பினால்)',
+                'submit-user-info-btn': 'தொடரவும்',
+                'chat-welcome-message': 'வணக்கம்! நான் உங்கள் தனிப்பட்ட சுகாதார உதவியாளர். உங்கள் அறிகுறிகள் அல்லது கவலைகளை விவரிக்கவும், நான் தகவல் மற்றும் வழிகாட்டுதலை வழங்க என்னால் முடிந்தவரை முயற்சிப்பேன். நான் இன்று உங்களுக்கு எப்படி உதவ முடியும்?',
+                'chat-input-placeholder': 'உங்கள் அறிகுறிகளை விவரிக்கவும்...',
+                'chat-thinking-message': 'தட்டச்சு செய்கிறது...',
+                'menu-profile': 'சுயவிவரம்',
+                'menu-history': 'வரலாறு',
+                'menu-yoga': 'யோகா தகவல்',
+                'menu-medicine': 'அடிப்படை மருந்து தகவல்',
+                'menu-logout': 'வெளியேறு',
+                'profile-title': 'சுயவிவரம்',
+                'profile-verify-info-title': 'உங்கள் தகவலைச் சரிபார்க்கவும்',
+                'profile-verify-info-text': 'உங்கள் அரட்டை வரலாற்றைப் பாதுகாப்பாக அணுகவும் சேமிக்கவும் உங்கள் மொபைல் எண்ணைச் சரிபார்க்கவும்.',
+                'profile-mobile-placeholder': 'மொபைல் எண்ணை உள்ளிடவும்',
+                'profile-send-otp-btn': 'OTP அனுப்பு',
+                'profile-or-text': 'அல்லது',
+                'profile-google-signin': 'Google மூலம் உள்நுழைக',
+                'history-title': 'வரலாறு',
+                'history-content': 'நீங்கள் உள்நுழைந்ததும் உங்கள் அரட்டை வரலாறு இங்கே தோன்றும்.',
+                'video-call-title': 'AI வீடியோ அழைப்பு',
+                'modal-logout': 'நீங்கள் வெளியேறிவிட்டீர்கள்.',
+                'modal-invalid-age': 'சரியான வயதை உள்ளிடவும்.',
+                'video-log-text': 'உங்கள் குரல் ஆலோசனையைத் தொடங்க திரையைத் தட்டவும்.',
+                'video-tap-prompt': 'பேசத் தொடங்க திரையில் எங்கும் தட்டவும்.'
+            },
+            'te-IN': {
+                'user-info-title': 'మీ వివరాలను అందించండి',
+                'gender-label': 'లింగం',
+                'gender-option-male': 'పురుషుడు',
+                'gender-option-female': 'స్త్రీ',
+                'gender-option-other': 'ఇతర',
+                'age-label': 'వయస్సు',
+                'age-input-placeholder': 'మీ వయస్సు నమోదు చేయండి',
+                'diseases-label': 'ఏదైనా ముందుగా ఉన్న వ్యాధులు (ఉదా. బిపి, మధుమేహం)',
+                'diseases-input-placeholder': 'వ్యాధులను నమోదు చేయండి (ఐచ్ఛికం)',
+                'submit-user-info-btn': 'కొనసాగించు',
+                'chat-welcome-message': 'నమస్కారం! నేను మీ వ్యక్తిగత ఆరోగ్య సహాయకుడిని. మీ లక్షణాలు లేదా ఆందోళనలను వివరించండి, మరియు నేను సమాచారం మరియు మార్గదర్శకత్వం అందించడానికి నా వంతు కృషి చేస్తాను. నేను ఈ రోజు మీకు ఎలా సహాయపడగలను?',
+                'chat-input-placeholder': 'మీ లక్షణాలను వివరించండి...',
+                'chat-thinking-message': 'టైప్ చేస్తోంది...',
+                'menu-profile': 'ప్రొఫైల్',
+                'menu-history': 'చరిత్ర',
+                'menu-yoga': 'యోగా సమాచారం',
+                'menu-medicine': 'ప్రాథమిక மருந்து సమాచారం',
+                'menu-logout': 'లాగ్ అవుట్',
+                'profile-title': 'ప్రొఫైల్',
+                'profile-verify-info-title': 'మీ సమాచారాన్ని ధృవీకరించండి',
+                'profile-verify-info-text': 'మీ చాట్ చరిత్రను సురక్షితంగా యాక్సెస్ చేయడానికి మరియు సేవ్ చేయడానికి మీ మొబైల్ నంబర్‌ను ధృవీకరించండి.',
+                'profile-mobile-placeholder': 'మొబైల్ నంబర్‌ను నమోదు చేయండి',
+                'profile-send-otp-btn': 'OTP పంపండి',
+                'profile-or-text': 'లేదా',
+                'profile-google-signin': 'Googleతో సైన్ ఇన్ చేయండి',
+                'history-title': 'చరిత్ర',
+                'history-content': 'మీరు సైన్ ఇన్ చేసిన తర్వాత మీ చాట్ చరిత్ర ఇక్కడ కనిపిస్తుంది.',
+                'video-call-title': 'AI వీడియో కాల్',
+                'modal-logout': 'మీరు లాగ్ అవుట్ అయ్యారు.',
+                'modal-invalid-age': 'దయచేసి చెల్లుబాటు అయ్యే వయస్సును నమోదు చేయండి.',
+                'video-log-text': 'మీ వాయిస్ కన్సల్టేషన్ ప్రారంభించడానికి స్క్రీన్‌పై నొక్కండి.',
+                'video-tap-prompt': 'మాట్లాడటం ప్రారంభించడానికి స్క్రీన్‌పై ఎక్కడైనా నొక్కండి.'
+            },
+            'kn-IN': {
+                'user-info-title': 'ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಒದಗಿಸಿ',
+                'gender-label': 'ಲಿಂಗ',
+                'gender-option-male': 'ಪುರುಷ',
+                'gender-option-female': 'ಮಹಿಳೆ',
+                'gender-option-other': 'ಇತರ',
+                'age-label': 'ವಯಸ್ಸು',
+                'age-input-placeholder': 'ನಿಮ್ಮ ವಯಸ್ಸನ್ನು ನಮೂದಿಸಿ',
+                'diseases-label': 'ಯಾವುದೇ ಪೂರ್ವ-ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ರೋಗಗಳು (ಉದಾ. ಬಿಪಿ, ಮಧುಮೇಹ)',
+                'diseases-input-placeholder': 'ರೋಗಗಳನ್ನು ನಮೂದಿಸಿ (ಐಚ್ಛಿಕ)',
+                'submit-user-info-btn': 'ಮುಂದುವರಿಯಿರಿ',
+                'chat-welcome-message': 'ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಆರೋಗ್ಯ ಸಹಾಯಕ. ನಿಮ್ಮ ರೋಗಲಕ್ಷಣಗಳು ಅಥವಾ ಕಾಳಜಿಗಳನ್ನು ವಿವರಿಸಿ, ಮತ್ತು ನಾನು ಮಾಹಿತಿ ಮತ್ತು ಮಾರ್ಗದರ್ಶನ ನೀಡಲು ನನ್ನ ಕೈಲಾದಷ್ಟು ಪ್ರಯತ್ನಿಸುತ್ತೇನೆ. ನಾನು ಇಂದು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?',
+                'chat-input-placeholder': 'ನಿಮ್ಮ ರೋಗಲಕ್ಷಣಗಳನ್ನು ವಿವರಿಸಿ...',
+                'chat-thinking-message': 'ಟೈಪ್ ಮಾಡುತ್ತಿದೆ...',
+                'menu-profile': 'ಪ್ರೊಫೈಲ್',
+                'menu-history': 'ಇತಿಹಾಸ',
+                'menu-yoga': 'ಯೋಗ ಮಾಹಿತಿ',
+                'menu-medicine': 'ಮೂಲಭೂತ ಔಷಧಿ ಮಾಹಿತಿ',
+                'menu-logout': 'ಲಾಗ್ ಔಟ್',
+                'profile-title': 'ಪ್ರೊಫೈಲ್',
+                'profile-verify-info-title': 'ನಿಮ್ಮ ಮಾಹಿತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ',
+                'profile-verify-info-text': 'ನಿಮ್ಮ ಚಾಟ್ ಇತಿಹಾಸವನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಪ್ರವೇಶಿಸಲು ಮತ್ತು ಉಳಿಸಲು ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸಿ.',
+                'profile-mobile-placeholder': 'ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ',
+                'profile-send-otp-btn': 'OTP ಕಳುಹಿಸಿ',
+                'profile-or-text': 'ಅಥವಾ',
+                'profile-google-signin': 'Google ನೊಂದಿಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ',
+                'history-title': 'ಇತಿಹಾಸ',
+                'history-content': 'ನೀವು ಸೈನ್ ಇನ್ ಮಾಡಿದ ನಂತರ ನಿಮ್ಮ ಚಾಟ್ ಇತಿಹಾಸ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.',
+                'video-call-title': 'AI ವಿಡಿಯೋ ಕರೆ',
+                'modal-logout': 'ನೀವು ಲಾಗ್ ಔಟ್ ಆಗಿದ್ದೀರಿ.',
+                'modal-invalid-age': 'ದಯವಿಟ್ಟು ಮಾನ್ಯ ವಯಸ್ಸನ್ನು ನಮೂದಿಸಿ.',
+                'video-log-text': 'ನಿಮ್ಮ ಧ್ವನಿ ಸಮಾಲೋಚನೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲು ಪರದೆಯನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ.',
+                'video-tap-prompt': 'ಮಾತನಾಡಲು ಪ್ರಾರಂಭಿಸಲು ಪರದೆಯ ಮೇಲೆ ಎಲ್ಲಿಯಾದರೂ ಟ್ಯಾಪ್ ಮಾಡಿ.'
+            },
+            'ml-IN': {
+                'user-info-title': 'നിങ്ങളുടെ വിവരങ്ങൾ നൽകുക',
+                'gender-label': 'ലിംഗഭേദം',
+                'gender-option-male': 'പുരുഷൻ',
+                'gender-option-female': 'സ്ത്രീ',
+                'gender-option-other': 'മറ്റുള്ളവ',
+                'age-label': 'പ്രായം',
+                'age-input-placeholder': 'നിങ്ങളുടെ പ്രായം നൽകുക',
+                'diseases-label': 'നിലവിലുള്ള രോഗങ്ങൾ (ഉദാഹരണത്തിന്, ബിപി, പ്രമേഹം)',
+                'diseases-input-placeholder': 'രോഗങ്ങൾ നൽകുക (ഓപ്ഷണൽ)',
+                'submit-user-info-btn': 'തുടരുക',
+                'chat-welcome-message': 'നമസ്കാരം! ഞാൻ നിങ്ങളുടെ വ്യക്തിപരമായ ആരോഗ്യ സഹായിയാണ്. നിങ്ങളുടെ ലക്ഷണങ്ങളോ ആശങ്കകളോ വിവരിക്കുക, വിവരങ്ങളും മാർഗ്ഗനിർദ്ദേശങ്ങളും നൽകാൻ ഞാൻ പരമാവധി ശ്രമിക്കാം. ഇന്ന് ഞാൻ നിങ്ങളെ എങ്ങനെ സഹായിക്കും?',
+                'chat-input-placeholder': 'നിങ്ങളുടെ ലക്ഷണങ്ങൾ വിവരിക്കുക...',
+                'chat-thinking-message': 'ടൈപ്പ് ചെയ്യുന്നു...',
+                'menu-profile': 'പ്രൊഫൈൽ',
+                'menu-history': 'ചരിത്രം',
+                'menu-yoga': 'യോഗയെക്കുറിച്ചുള്ള വിവരങ്ങൾ',
+                'menu-medicine': 'അടിസ്ഥാന മരുന്ന് വിവരങ്ങൾ',
+                'menu-logout': 'ലോഗ് ഔട്ട്',
+                'profile-title': 'പ്രൊഫൈൽ',
+                'profile-verify-info-title': 'നിങ്ങളുടെ വിവരങ്ങൾ പരിശോധിക്കുക',
+                'profile-verify-info-text': 'നിങ്ങളുടെ ചാറ്റ് ചരിത്രം സുരക്ഷിതമായി ആക്‌സസ് ചെയ്യാനും സംരക്ഷിക്കാനും നിങ്ങളുടെ മൊബൈൽ നമ്പർ പരിശോധിക്കുക.',
+                'profile-mobile-placeholder': 'മൊബൈൽ നമ്പർ നൽകുക',
+                'profile-send-otp-btn': 'ഒടിപി അയയ്ക്കുക',
+                'profile-or-text': 'അല്ലെങ്കിൽ',
+                'profile-google-signin': 'Google ഉപയോഗിച്ച് സൈൻ ഇൻ ചെയ്യുക',
+                'history-title': 'ചരിത്രം',
+                'history-content': 'നിങ്ങൾ സൈൻ ഇൻ ചെയ്തുകഴിഞ്ഞാൽ നിങ്ങളുടെ ചാറ്റ് ചരിത്രം ഇവിടെ ദൃശ്യമാകും.',
+                'video-call-title': 'AI വീഡിയോ കോൾ',
+                'modal-logout': 'നിങ്ങൾ ലോഗ് ഔട്ട് ചെയ്തു.',
+                'modal-invalid-age': 'ദയവായി സാധുവായ പ്രായം നൽകുക.',
+                'video-log-text': 'വോയിസ് കൺസൾട്ടേഷൻ ആരംഭിക്കാൻ സ്‌ക്രീനിൽ ടാപ്പുചെയ്യുക.',
+                'video-tap-prompt': 'സംസാരിച്ചു തുടങ്ങാൻ സ്‌ക്രീനിൽ എവിടെയും ടാപ്പുചെയ്യുക.'
+            },
+            'gu-IN': {
+                'user-info-title': 'તમારી વિગતો પ્રદાન કરો',
+                'gender-label': 'લિંગ',
+                'gender-option-male': 'પુરુષ',
+                'gender-option-female': 'મહિલા',
+                'gender-option-other': 'અન્ય',
+                'age-label': 'ઉંમર',
+                'age-input-placeholder': 'તમારી ઉંમર દાખલ કરો',
+                'diseases-label': 'કોઈપણ હાલના રોગો (દા.ત. બીપી, ડાયાબિટીસ)',
+                'diseases-input-placeholder': 'રોગો દાખલ કરો (વૈકલ્પિક)',
+                'submit-user-info-btn': 'ચાલુ રાખો',
+                'chat-welcome-message': 'નમસ્કાર! હું તમારો વ્યક્તિગત આરોગ્ય સહાયક છું. તમારા લક્ષણો અથવા ચિંતાઓનું વર્ણન કરો, અને હું માહિતી અને માર્ગદર્શન આપવા માટે મારા શ્રેષ્ઠ પ્રયાસો કરીશ. હું આજે તમને કેવી રીતે મદદ કરી શકું?',
+                'chat-input-placeholder': 'તમારા લક્ષણોનું વર્ણન કરો...',
+                'chat-thinking-message': 'ટાઈપ કરી રહ્યું છે...',
+                'menu-profile': 'પ્રોફાઇલ',
+                'menu-history': 'ઇતિહાસ',
+                'menu-yoga': 'યોગની માહિતી',
+                'menu-medicine': 'મૂળભૂત દવાની માહિતી',
+                'menu-logout': 'લોગ આઉટ',
+                'profile-title': 'પ્રોફાઇલ',
+                'profile-verify-info-title': 'તમારી માહિતી ચકાસો',
+                'profile-verify-info-text': 'તમારા ચેટ ઇતિહાસને સુરક્ષિત રીતે ઍક્સેસ કરવા અને સાચવવા માટે તમારો મોબાઇલ નંબર ચકાસો.',
+                'profile-mobile-placeholder': 'મોબાઇલ નંબર દાખલ કરો',
+                'profile-send-otp-btn': 'OTP મોકલો',
+                'profile-or-text': 'અથવા',
+                'profile-google-signin': 'Google વડે સાઇન ઇન કરો',
+                'history-title': 'ઇતિહાસ',
+                'history-content': 'તમે સાઇન ઇન કર્યા પછી તમારો ચેટ ઇતિહાસ અહીં દેખાશે.',
+                'video-call-title': 'AI વીડિયો કૉલ',
+                'modal-logout': 'તમે લોગ આઉટ થઈ ગયા છો.',
+                'modal-invalid-age': 'કૃપા કરીને માન્ય ઉંમર દાખલ કરો.',
+                'video-log-text': 'તમારા વૉઇસ કન્સલ્ટેશન શરૂ કરવા માટે સ્ક્રીનને ટેપ કરો.',
+                'video-tap-prompt': 'બોલવાનું શરૂ કરવા માટે સ્ક્રીન પર ગમે ત્યાં ટેપ કરો.'
+            },
+            'pa-IN': {
+                'user-info-title': 'ਆਪਣੇ ਵੇਰਵੇ ਪ੍ਰਦਾਨ ਕਰੋ',
+                'gender-label': 'ਲਿੰਗ',
+                'gender-option-male': 'ਮਰਦ',
+                'gender-option-female': 'ਔਰਤ',
+                'gender-option-other': 'ਹੋਰ',
+                'age-label': 'ਉਮਰ',
+                'age-input-placeholder': 'ਆਪਣੀ ਉਮਰ ਦਰਜ ਕਰੋ',
+                'diseases-label': 'ਕੋਈ ਵੀ ਪਹਿਲਾਂ ਤੋਂ ਮੌਜੂਦ ਬਿਮਾਰੀਆਂ (ਜਿਵੇਂ ਕਿ ਬੀਪੀ, ਸ਼ੂਗਰ)',
+                'diseases-input-placeholder': 'ਬਿਮਾਰੀਆਂ ਦਰਜ ਕਰੋ (ਵਿਕਲਪਿਕ)',
+                'submit-user-info-btn': 'ਜਾਰੀ ਰੱਖੋ',
+                'chat-welcome-message': 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਤੁਹਾਡਾ ਨਿੱਜੀ ਸਿਹਤ ਸਹਾਇਕ ਹਾਂ। ਆਪਣੇ ਲੱਛਣਾਂ ਜਾਂ ਚਿੰਤਾਵਾਂ ਦਾ ਵਰਣਨ ਕਰੋ, ਅਤੇ ਮੈਂ ਜਾਣਕਾਰੀ ਅਤੇ ਮਾਰਗਦਰਸ਼ਨ ਪ੍ਰਦਾਨ ਕਰਨ ਲਈ ਆਪਣੀ ਪੂਰੀ ਕੋਸ਼ਿਸ਼ ਕਰਾਂਗਾ। ਮੈਂ ਅੱਜ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?',
+                'chat-input-placeholder': 'ਆਪਣੇ ਲੱਛਣਾਂ ਦਾ ਵਰਣਨ ਕਰੋ...',
+                'chat-thinking-message': 'ਟਾਈਪ ਕਰ ਰਿਹਾ ਹੈ...',
+                'menu-profile': 'ਪ੍ਰੋਫਾਈਲ',
+                'menu-history': 'ਇਤਿਹਾਸ',
+                'menu-yoga': 'ਯੋਗ ਦੀ ਜਾਣਕਾਰੀ',
+                'menu-medicine': 'ਮੁੱਢਲੀ ਦਵਾਈ ਦੀ ਜਾਣਕਾਰੀ',
+                'menu-logout': 'ਲੌਗ ਆਉਟ',
+                'profile-title': 'ਪ੍ਰੋਫਾਈਲ',
+                'profile-verify-info-title': 'ਆਪਣੀ ਜਾਣਕਾਰੀ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ',
+                'profile-verify-info-text': 'ਆਪਣੇ ਚੈਟ ਇਤਿਹਾਸ ਨੂੰ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਐਕਸੈਸ ਕਰਨ ਅਤੇ ਸੁਰੱਖਿਅਤ ਕਰਨ ਲਈ ਆਪਣੇ ਮੋਬਾਈਲ ਨੰਬਰ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ।',
+                'profile-mobile-placeholder': 'ਮੋਬਾਈਲ ਨੰਬਰ ਦਰਜ ਕਰੋ',
+                'profile-send-otp-btn': 'OTP ਭੇਜੋ',
+                'profile-or-text': 'ਜਾਂ',
+                'profile-google-signin': 'Google ਨਾਲ ਸਾਈਨ ਇਨ ਕਰੋ',
+                'history-title': 'ਇਤਿਹਾਸ',
+                'history-content': 'ਤੁਹਾਡੇ ਸਾਈਨ ਇਨ ਕਰਨ ਤੋਂ ਬਾਅਦ ਤੁਹਾਡਾ ਚੈਟ ਇਤਿਹਾਸ ਇੱਥੇ ਦਿਖਾਈ ਦੇਵੇਗਾ।',
+                'video-call-title': 'AI ਵੀਡੀਓ ਕਾਲ',
+                'modal-logout': 'ਤੁਸੀਂ ਲੌਗ ਆਉਟ ਹੋ ਗਏ ਹੋ।',
+                'modal-invalid-age': 'ਕਿਰਪਾ ਕਰਕੇ ਇੱਕ ਵੈਧ ਉਮਰ ਦਰਜ ਕਰੋ।',
+                'video-log-text': 'ਆਪਣੀ ਵੌਇਸ ਸਲਾਹ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਸਕ੍ਰੀਨ ਨੂੰ ਟੈਪ ਕਰੋ।',
+                'video-tap-prompt': 'ਬੋਲਣਾ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਸਕ੍ਰੀਨ ਤੇ ਕਿਤੇ ਵੀ ਟੈਪ ਕਰੋ।'
+            },
+            'or-IN': {
+                'user-info-title': 'ଆପଣଙ୍କର ବିବରଣୀ ପ୍ରଦାନ କରନ୍ତୁ',
+                'gender-label': 'ଲିଙ୍ଗ',
+                'gender-option-male': 'ପୁରୁଷ',
+                'gender-option-female': 'ମହିଳା',
+                'gender-option-other': 'ଅନ୍ୟାନ୍ୟ',
+                'age-label': 'ବୟସ',
+                'age-input-placeholder': 'ଆପଣଙ୍କର ବୟସ ପ୍ରବେଶ କରନ୍ତୁ',
+                'diseases-label': 'ଯେକୌଣସି ପୂର୍ବରୁ ଥିବା ରୋଗ (ଯେପରିକି ବିପି, ମଧୁମେହ)',
+                'diseases-input-placeholder': 'ରୋଗ ପ୍ରବେଶ କରନ୍ତୁ (ବ al କଳ୍ପିକ)',
+                'submit-user-info-btn': 'ଚାଲନ୍ତୁ',
+                'chat-welcome-message': 'ନମସ୍କାର! ମୁଁ ଆପଣଙ୍କର ବ୍ୟକ୍ତିଗତ ସ୍ୱାସ୍ଥ୍ୟ ସହାୟକ | ଆପଣଙ୍କର ଲକ୍ଷଣ କିମ୍ବା ଚିନ୍ତା ବର୍ଣ୍ଣନା କରନ୍ତୁ, ଏବଂ ମୁଁ ସୂଚନା ଏବଂ ମାର୍ଗଦର୍ଶନ ପ୍ରଦାନ କରିବାକୁ ମୋର ସର୍ବୋତ୍ତମ ଚେଷ୍ଟା କରିବି | ମୁଁ ଆଜି ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?',
+                'chat-input-placeholder': 'ଆପଣଙ୍କର ଲକ୍ଷଣ ବର୍ଣ୍ଣନା କରନ୍ତୁ...',
+                'chat-thinking-message': 'ଟାଇପ୍ କରୁଛି...',
+                'menu-profile': 'ପ୍ରୋଫାଇଲ୍',
+                'menu-history': 'ଇତିହାସ',
+                'menu-yoga': 'ଯୋଗ ସୂଚନା',
+                'menu-medicine': 'ମୌଳିକ ଔଷଧ ସୂଚନା',
+                'menu-logout': 'ଲଗ୍ ଆଉଟ୍',
+                'profile-title': 'ପ୍ରୋଫାଇଲ୍',
+                'profile-verify-info-title': 'ଆପଣଙ୍କର ସୂଚନା ଯାଞ୍ଚ କରନ୍ତୁ',
+                'profile-verify-info-text': 'ଆପଣଙ୍କର ଚାଟ୍ ଇତିହାସକୁ ସୁରକ୍ଷିତ ଭାବରେ ପ୍ରବେଶ ଏବଂ ସଂରକ୍ଷଣ କରିବାକୁ ଆପଣଙ୍କର ମୋବାଇଲ୍ ନମ୍ବର ଯାଞ୍ଚ କରନ୍ତୁ |',
+                'profile-mobile-placeholder': 'ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ',
+                'profile-send-otp-btn': 'OTP ପଠାନ୍ତୁ',
+                'profile-or-text': 'କିମ୍ବା',
+                'profile-google-signin': 'Google ସହିତ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ',
+                'history-title': 'ଇତିହାସ',
+                'history-content': 'ଆପଣ ସାଇନ୍ ଇନ୍ କରିବା ପରେ ଆପଣଙ୍କର ଚାଟ୍ ଇତିହାସ ଏଠାରେ ଦେଖାଯିବ |',
+                'video-call-title': 'AI ଭିଡିଓ କଲ୍',
+                'modal-logout': 'ଆପଣ ଲଗ୍ ଆଉଟ୍ ହୋଇଯାଇଛନ୍ତି |',
+                'modal-invalid-age': 'ଦୟାକରି ଏକ ବ valid ଧ ବୟସ ପ୍ରବେଶ କରନ୍ତୁ |',
+                'video-log-text': 'ଆପଣଙ୍କର ଭଏସ୍ ପରାମର୍ଶ ଆରମ୍ଭ କରିବାକୁ ସ୍କ୍ରିନକୁ ଟ୍ୟାପ୍ କରନ୍ତୁ |',
+                'video-tap-prompt': 'କଥାବାର୍ତ୍ତା ଆରମ୍ଭ କରିବାକୁ ସ୍କ୍ରିନରେ ଯେକୌଣସି ସ୍ଥାନରେ ଟ୍ୟାପ୍ କରନ୍ତୁ |'
+            }
+        };
+
+        let currentLanguage = 'en-US';
+        let userData = {
+            gender: 'male',
+            age: '',
+            diseases: ''
+        };
+        
+        function selectPrompt(prompt) {
+            const userInputElement = document.getElementById('user-input');
+            const chatFormElement = document.getElementById('chat-form');
+            if (userInputElement && chatFormElement) {
+                userInputElement.value = prompt;
+                chatFormElement.dispatchEvent(new Event('submit', { cancelable: true }));
+            }
+        }
+
+        function updateUI(languageCode) {
+            const strings = translations[languageCode];
+        
+            // Update all elements with a translatable ID
+            const translatableElements = [
+                'user-info-title', 'gender-label', 'gender-option-male', 'gender-option-female', 'gender-option-other', 'age-label', 'age-input-placeholder', 'diseases-label', 'diseases-input-placeholder', 'submit-user-info-btn',
+                'chat-welcome-message', 'chat-input-placeholder', 'chat-thinking-message',
+                'menu-profile', 'menu-history', 'menu-yoga', 'menu-medicine', 'menu-logout',
+                'profile-title', 'profile-verify-info-title', 'profile-verify-info-text', 'profile-mobile-placeholder', 'profile-send-otp-btn', 'profile-or-text',
+                'history-title', 'history-content',
+                'yoga-title', 'yoga-standing-title', 'yoga-standing-text', 'yoga-seated-title', 'yoga-seated-text', 'yoga-supine-title', 'yoga-supine-text', 'yoga-prone-title', 'yoga-prone-text', 'yoga-support-title', 'yoga-support-text', 'yoga-balance-title', 'yoga-balance-text',
+                'medicine-title', 'pain-relievers-title', 'pain-relievers-text', 'pain-relievers-item-1', 'pain-relievers-item-2', 'pain-relievers-item-3', 'antacids-title', 'antacids-text', 'antacids-item-1', 'antacids-item-2', 'antacids-item-3', 'cold-flu-title', 'cold-flu-text', 'cold-flu-item-1', 'cold-flu-item-2', 'cold-flu-item-3', 'allergy-title', 'allergy-text', 'allergy-item-1', 'allergy-item-2', 'allergy-item-3',
+                'home-remedies-title', 'home-remedies-text', 'home-remedies-item-1', 'home-remedies-item-2', 'home-remedies-item-3', 'home-remedies-item-4', 
+                'video-call-title', 'modal-logout', 'modal-invalid-age', 'video-log-text', 'video-tap-prompt'
+            ];
+        
+            translatableElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element && strings[id]) {
+                    if (id.includes('item')) {
+                        element.innerHTML = strings[id];
+                    } else if (id.includes('placeholder')) {
+                        element.setAttribute('placeholder', strings[id]);
+                    } else if (element.tagName === 'BUTTON' && id === 'submit-user-info-btn') {
+                        element.textContent = strings[id];
+                    } else if (id === 'age-input-placeholder' || id === 'diseases-input-placeholder' || id === 'chat-input-placeholder' || id === 'profile-mobile-placeholder') {
+                        // Handle placeholders for inputs
+                        const inputElement = document.getElementById(id.replace('-placeholder', ''));
+                        if (inputElement) {
+                             inputElement.setAttribute('placeholder', strings[id]);
+                        }
+                    } else if (element.tagName === 'INPUT' || element.tagName === 'SELECT' || id === 'diseases-label' || id === 'age-label' || id === 'gender-label' || id === 'submit-user-info-btn' || id === 'profile-send-otp-btn') {
+                         if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
+                            element.setAttribute('placeholder', strings[id]);
+                        } else if (element.tagName !== 'INPUT') {
+                            element.textContent = strings[id];
+                        }
+                    } else {
+                        element.textContent = strings[id];
+                    }
+                }
+            });
+            document.getElementById('google-signin-btn').querySelector('span').textContent = strings['profile-google-signin'];
+
+            if (preDefinedPrompts[languageCode]) {
+                const chatPagePredefinedOptions = document.getElementById('pre-defined-options');
+                if (chatPagePredefinedOptions) {
+                    chatPagePredefinedOptions.innerHTML = '';
+                    preDefinedPrompts[languageCode].forEach(item => {
+                        const button = document.createElement('button');
+                        button.classList.add('bg-gray-200', 'text-gray-800', 'px-4', 'py-2', 'rounded-full', 'text-sm', 'hover:bg-gray-300', 'transition-colors');
+                        button.textContent = item.text;
+                        button.onclick = () => selectPrompt(item.prompt);
+                        chatPagePredefinedOptions.appendChild(button);
+                    });
+                }
+            }
+        }
+
+        // Function to show custom modal
+        function showModal(message) {
+            const modal = document.getElementById('custom-modal');
+            const modalText = document.getElementById('modal-text');
+            modalText.textContent = message;
+            modal.style.display = 'flex';
+        }
+
+        // Function to hide custom modal
+        function hideModal() {
+            const modal = document.getElementById('custom-modal');
+            modal.style.display = 'none';
+        }
+
+        document.getElementById('modal-close-btn').addEventListener('click', hideModal);
+
+        // --- State Cleanup ---
+        let recognition; // Keep recognition instance accessible
+        let audioContext; // Keep audio context accessible
+        let isListening = false;
+        let animationFrameId = null;
+        let currentAudioSource = null;
+
+        function cleanupActiveSessions() {
+            // Stop speech recognition if it's running
+            if (recognition && isListening) {
+                recognition.stop();
+                isListening = false;
+                console.log("Speech recognition stopped.");
+            }
+            // Stop any playing audio
+            if (currentAudioSource) {
+                currentAudioSource.stop();
+                currentAudioSource = null;
+                console.log("Audio playback stopped.");
+            }
+            if (audioContext && audioContext.state !== 'closed') {
+                audioContext.close().then(() => {
+                    audioContext = null;
+                    console.log("AudioContext closed.");
+                });
+            }
+            stopLipAnimation();
+        }
+
+        // Function to handle page transitions
+        function showPage(pageId) {
+            // Before switching pages, clean up any active voice/audio sessions
+            cleanupActiveSessions();
+            
+            const pages = [landingPage, languagePage, userInfoPage, modeSelectionPage, chatPage, awarenessPage, videoCallPage, profilePage, historyPage, yogaPage, basicMedicinePage];
+            pages.forEach(page => {
+                if (page.id === pageId) {
+                    page.classList.remove('opacity-0', 'hidden');
+                    page.classList.add('opacity-100', 'flex');
+                } else {
+                    page.classList.remove('opacity-100');
+                    page.classList.add('opacity-0');
+                    setTimeout(() => {
+                        page.classList.remove('flex');
+                        page.classList.add('hidden');
+                    }, 500);
+                }
+            });
+            // Hide the dropdown menu when a new page is shown
+            const menuDropdown = document.getElementById('menu-dropdown');
+            if (menuDropdown) {
+                menuDropdown.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners for page transitions
+        document.getElementById('get-started-btn').addEventListener('click', () => showPage('language-page'));
+        document.getElementById('back-from-language-btn').addEventListener('click', () => showPage('landing-page'));
+        document.getElementById('back-from-user-info-btn').addEventListener('click', () => showPage('language-page'));
+        document.getElementById('back-from-mode-btn').addEventListener('click', () => showPage('user-info-page'));
+        document.getElementById('back-to-mode-btn-from-chat').addEventListener('click', () => {
+            showPage('mode-selection-page')
+        });
+        document.getElementById('back-to-chat-btn').addEventListener('click', () => showPage('chat-page'));
+        document.getElementById('back-from-history-btn').addEventListener('click', () => showPage('chat-page'));
+        document.getElementById('back-from-yoga-btn').addEventListener('click', () => showPage('chat-page'));
+        document.getElementById('back-from-medicine-btn').addEventListener('click', () => showPage('chat-page'));
+        document.getElementById('back-to-mode-btn-from-awareness').addEventListener('click', () => showPage('mode-selection-page'));
+        document.getElementById('back-from-video-call-btn').addEventListener('click', () => showPage('mode-selection-page'));
+
+
+        // Language selection buttons now lead to user info page
+        document.getElementById('lang-en').addEventListener('click', () => {
+            currentLanguage = 'en-US';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+        document.getElementById('lang-hi').addEventListener('click', () => {
+            currentLanguage = 'hi-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+        document.getElementById('lang-mr').addEventListener('click', () => {
+            currentLanguage = 'mr-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+        document.getElementById('lang-bn').addEventListener('click', () => {
+            currentLanguage = 'bn-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+
+        document.getElementById('lang-ta').addEventListener('click', () => {
+            currentLanguage = 'ta-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+
+        document.getElementById('lang-te').addEventListener('click', () => {
+            currentLanguage = 'te-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+
+        document.getElementById('lang-kn').addEventListener('click', () => {
+            currentLanguage = 'kn-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+        
+        document.getElementById('lang-ml').addEventListener('click', () => {
+            currentLanguage = 'ml-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+
+        document.getElementById('lang-gu').addEventListener('click', () => {
+            currentLanguage = 'gu-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+
+        document.getElementById('lang-pa').addEventListener('click', () => {
+            currentLanguage = 'pa-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+
+        document.getElementById('lang-or').addEventListener('click', () => {
+            currentLanguage = 'or-IN';
+            showPage('user-info-page');
+            updateUI(currentLanguage);
+        });
+
+        // User info form submission
+        document.getElementById('user-info-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            userData.gender = document.getElementById('gender-select').value;
+            userData.age = document.getElementById('age-input').value;
+            userData.diseases = document.getElementById('diseases-input').value;
+
+            // Simple validation
+            if (!userData.age || isNaN(userData.age) || userData.age <= 0) {
+                showModal(translations[currentLanguage]['modal-invalid-age']);
+                return;
+            }
+
+            showPage('mode-selection-page');
+            updateUI(currentLanguage);
+        });
+        
+        document.getElementById('chatbot-btn').addEventListener('click', () => {
+            showPage('chat-page');
+            updateUI(currentLanguage);
+        });
+
+        document.getElementById('awareness-btn').addEventListener('click', () => {
+            showPage('awareness-page');
+            updateUI(currentLanguage);
+        });
+        
+        document.getElementById('video-call-btn').addEventListener('click', () => {
+            showPage('video-call-page');
+            updateUI(currentLanguage);
+        });
+
+        // Menu button functionality
+        const menuBtnElement = document.getElementById('menu-btn');
+        const menuDropdownElement = document.getElementById('menu-dropdown');
+        if (menuBtnElement) {
+            menuBtnElement.addEventListener('click', (event) => {
+                event.stopPropagation();
+                menuDropdownElement.classList.toggle('hidden');
+            });
+        }
+
+
+        // Hide menu if user clicks anywhere else
+        document.addEventListener('click', (event) => {
+            if (menuDropdownElement && !menuDropdownElement.contains(event.target) && (!menuBtnElement || !menuBtnElement.contains(event.target))) {
+                menuDropdownElement.classList.add('hidden');
+            }
+        });
+
+
+        // Menu item click handlers
+        const profileMenuElement = document.getElementById('profile-menu-item');
+        if (profileMenuElement) {
+            profileMenuElement.addEventListener('click', () => showPage('profile-page'));
+        }
+        const historyMenuElement = document.getElementById('history-menu-item');
+        if (historyMenuElement) {
+            historyMenuElement.addEventListener('click', () => showPage('history-page'));
+        }
+        const yogaMenuElement = document.getElementById('yoga-menu-item');
+        if (yogaMenuElement) {
+            yogaMenuElement.addEventListener('click', () => showPage('yoga-page'));
+        }
+        const medicineMenuElement = document.getElementById('basic-medicine-menu-item');
+        if (medicineMenuElement) {
+            medicineMenuElement.addEventListener('click', () => showPage('basic-medicine-page'));
+        }
+        const logoutMenuElement = document.getElementById('logout-menu-item');
+        if (logoutMenuElement) {
+            logoutMenuElement.addEventListener('click', () => {
+                showModal(translations[currentLanguage]['modal-logout']);
+                showPage('landing-page');
+            });
+        }
+        
+        // Function to add a message to the chat history
+        function addMessage(text, isUser, historyElement) {
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('flex', 'p-2');
+            if (isUser) {
+                messageContainer.classList.add('justify-end');
+            } else {
+                messageContainer.classList.add('justify-start');
+            }
+
+
+            const messageBubble = document.createElement('div');
+            // Use innerHTML for Markdown formatting from the AI
+            messageBubble.classList.add('p-4', 'rounded-xl', 'max-w-[80%]', 'break-words');
+            
+            // Basic Markdown to HTML conversion for lists/bolding/headers 
+            let htmlText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                .replace(/^(#+)\s*(.*)$/gm, (match, hashes, content) => {
+                    const level = hashes.length > 3 ? 3 : hashes.length;
+                    return `<h${level} class="font-bold text-lg mt-2 mb-1">${content}</h${level}>`;
+                }) // Headers
+                .replace(/\n\s*-\s*(.*)/g, '<li class="ml-4 list-disc">$1</li>'); // Lists
+
+            // Replace plain newlines with <br> but avoid double <br>
+            htmlText = htmlText.replace(/\n/g, '<br>');
+            htmlText = htmlText.replace(/<br><br>/g, '<br>');
+
+
+            messageBubble.innerHTML = htmlText;
+            messageBubble.style.hyphens = 'auto';
+
+
+            if (isUser) {
+                messageBubble.classList.add('bg-blue-500', 'text-white');
+            } else {
+                messageBubble.classList.add('bg-gray-200', 'text-gray-800');
+            }
+
+
+            messageContainer.appendChild(messageBubble);
+            historyElement.appendChild(messageContainer);
+            historyElement.scrollTop = historyElement.scrollHeight;
+        }
+
+
+        // Handle chat form submission
+        const chatFormElement = document.getElementById('chat-form');
+        const userInputElement = document.getElementById('user-input');
+        const chatHistoryElement = document.querySelector('.chat-history');
+        if (chatFormElement && userInputElement && chatHistoryElement) {
+            chatFormElement.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const message = userInputElement.value.trim();
+                if (message === '') return;
+
+
+                // Add user's message to chat history
+                addMessage(message, true, chatHistoryElement);
+                userInputElement.value = '';
+
+                // Add a temporary "typing..." message
+                const thinkingMessageElement = document.createElement('div');
+                thinkingMessageElement.classList.add('flex', 'justify-start', 'p-2');
+                thinkingMessageElement.innerHTML = `
+                    <div class="bg-gray-200 text-gray-800 p-4 rounded-xl max-w-[80%]">
+                        <span class="animate-pulse">${translations[currentLanguage]['chat-thinking-message']}</span>
+                    </div>
+                `;
+                chatHistoryElement.appendChild(thinkingMessageElement);
+                chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
+
+
+                try {
+                    let languagePrompt;
+                    switch (currentLanguage) {
+                        case 'hi-IN': languagePrompt = ' in Hindi'; break;
+                        case 'mr-IN': languagePrompt = ' in Marathi'; break;
+                        case 'bn-IN': languagePrompt = ' in Bengali'; break;
+                        case 'ta-IN': languagePrompt = ' in Tamil'; break;
+                        case 'te-IN': languagePrompt = ' in Telugu'; break;
+                        case 'kn-IN': languagePrompt = ' in Kannada'; break;
+                        case 'ml-IN': languagePrompt = ' in Malayalam'; break;
+                        case 'gu-IN': languagePrompt = ' in Gujarati'; break;
+                        case 'pa-IN': languagePrompt = ' in Punjabi'; break;
+                        case 'or-IN': languagePrompt = ' in Odia'; break;
+                        default: languagePrompt = ' in English';
+                    }
+
+                    let generatedText;
+                    const apiKey = "AIzaSyAIrbRPntGXB1g-BkDT0dEn6GEFDmoj2LU"; // Set to empty string for secure environment variable injection
+                    
+                    const systemInstruction = `You are a helpful, friendly, and concise medical AI assistant named Dr. Quick. Provide a comprehensive response for the following symptoms. Your response must be${languagePrompt} and formatted clearly with sections for Diagnosis, Medicine, and Home Remedy.
+            
+                    **MEDICINE SECTION REQUIREMENTS:**
+                    1. Suggest the *cheapest generic medicine name* available in India, followed by one common brand name in parentheses (e.g., Paracetamol (Dolo 650)).
+                    2. Include its *approximate price in INR* (e.g., Approx. ₹ 20 for 10 tablets).
+                    3. Explain *how it works* (mechanism).
+                    4. List 1-2 major *side effects*.
+
+                    **HOME REMEDY SECTION REQUIREMENTS:**
+                    1. Suggest a *simple, effective Ayurvedic or kitchen-based home remedy* that uses only common ingredients (like ginger, honey, turmeric, salt, etc.).
+                    
+                    **CONTEXTUAL REQUIREMENTS:**
+                    - Critically consider the user's health profile (age, gender, pre-existing diseases) for all suggestions.
+                    - Do not provide any disclaimers or extra details outside of the requested format (Diagnosis, Medicine, Home Remedy). Use simple markdown for structure (e.g., **bold**, new lines, headers).
+            
+                    User Health Profile:
+                    - Gender: ${userData.gender}
+                    - Age: ${userData.age}
+                    - Pre-existing diseases: ${userData.diseases || 'None'}
+                    
+                    User Symptoms: ${message}`;
+
+                    const textPayload = {
+                        contents: [{
+                            parts: [{
+                                text: `User Symptoms: ${message}`
+                            }]
+                        }],
+                         systemInstruction: {
+                            parts: [{ text: systemInstruction }]
+                        }
+                    };
+
+                    const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                    const apiResponse = await fetch(textApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(textPayload)
+                    });
+                    const textResult = await apiResponse.json();
+
+                    // Remove the "typing..." message
+                    chatHistoryElement.removeChild(thinkingMessageElement);
+                    if (textResult.candidates && textResult.candidates.length > 0 &&
+                        textResult.candidates[0].content && textResult.candidates[0].content.parts &&
+                        textResult.candidates[0].content.parts.length > 0) {
+                        generatedText = textResult.candidates[0].content.parts[0].text;
+                        addMessage(generatedText, false, chatHistoryElement);
+
+                    } else {
+                        addMessage("I am sorry, I could not generate a response. Please try again.", false, chatHistoryElement);
+                    }
+                } catch (error) {
+                    console.error("Error fetching AI response:", error);
+                    chatHistoryElement.removeChild(thinkingMessageElement);
+                    addMessage("An error occurred while fetching the response. Please check your network connection.", false, chatHistoryElement);
+                }
+            });
+        }
+        
+        // Voice Assistant & Avatar Logic
+        // The __app_id, __firebase_config, and __initial_auth_token are provided by the canvas environment.
+        const __app_id = typeof window.__app_id !== 'undefined' ? window.__app_id : 'default-app-id';
+        const __firebase_config = typeof window.__firebase_config !== 'undefined' ? JSON.parse(window.__firebase_config) : {};
+        const __initial_auth_token = typeof window.__initial_auth_token !== 'undefined' ? window.__initial_auth_token : undefined;
+        // CRITICAL: API keys should NOT be stored in client-side code.
+        const apiKey = "AIzaSyAIrbRPntGXB1g-BkDT0dEn6GEFDmoj2LU";
+        
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        const micButton = document.getElementById('mic-button');
+        const videoLogText = document.getElementById('video-log-text');
+        
+        // Elements needed for Avatar Animation in Video Call Page
+        const avatarSvg = document.getElementById('avatarSvg');
+        const mouthGroup = document.getElementById('mouthGroup');
+        const mouth = document.getElementById('mouth');
+
+        function logVideo(message) {
+            if (videoLogText) {
+                videoLogText.textContent = message;
+            }
+        }
+
+        // --- Avatar Animation ---
+        function startLipAnimation(analyser) {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            const data = new Uint8Array(analyser.frequencyBinCount);
+
+            function frame() {
+                analyser.getByteFrequencyData(data);
+                const avg = data.reduce((sum, value) => sum + value, 0) / data.length / 255;
+                const amp = Math.max(0.12, avg * 3);
+                
+                if (mouth && mouthGroup) { // Check for existence before setting attributes
+                    // Update SVG elements for animation
+                    mouth.setAttribute('d', `M-20,0 C -10,${10 * (0.8 + amp)} 10,${10 * (0.8 + amp)} 20,0 Q 10,${2 + amp*2} -20,0 Z`);
+                    mouthGroup.setAttribute('transform', `translate(0,${30 + amp * 5})`);
+                }
+
+                animationFrameId = requestAnimationFrame(frame);
+            }
+            if (mouth && mouthGroup) {
+                animationFrameId = requestAnimationFrame(frame);
+            }
+        }
+
+        function stopLipAnimation() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            // Add null check here to prevent crash when elements are not on the current page
+            if (mouth && mouthGroup) {
+                mouth.setAttribute('d', 'M-20,0 C -10,10 10,10 20,0 Q 10,2 -20,0 Z');
+                mouthGroup.setAttribute('transform', 'translate(0,30)');
+            }
+        }
+
+        // --- Voice & TTS Logic ---
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        async function speakAndAnimate(text, startRecognitionOnEnd) {
+            if (!apiKey) {
+                logVideo("Voice features are disabled. API key is missing.");
+                // Still proceed to start recognition if requested, even without TTS
+                if (startRecognitionOnEnd && videoCallPage.classList.contains('opacity-100')) {
+                    startVoiceRecognition(false);
+                }
+                return;
+            }
+            const ttsPayload = {
+                contents: [{ parts: [{ text }] }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+            const ttsApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(ttsApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(ttsPayload)
+                });
+                const result = await response.json();
+                
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType;
+
+                if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
+                    const pcmData = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmData);
+
+                    if (!audioContext || audioContext.state === 'closed') {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    if (audioContext.state === 'suspended') {
+                        await audioContext.resume();
+                    }
+
+
+                    const audioBuffer = audioContext.createBuffer(1, pcm16.length, sampleRate);
+                    const nowBuffering = audioBuffer.getChannelData(0);
+                    for (let i = 0; i < pcm16.length; i++) {
+                        nowBuffering[i] = pcm16[i] / 32768;
+                    }
+
+                    const source = audioContext.createBufferSource();
+                    source.buffer = audioBuffer;
+                    currentAudioSource = source; // Store reference to the source
+                    
+                    const analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 256;
+                    source.connect(analyser);
+                    analyser.connect(audioContext.destination);
+
+                    source.onended = () => {
+                        stopLipAnimation();
+                        currentAudioSource = null;
+                        // Start listening only if explicitly requested (e.g., after the welcome message or AI response)
+                        if (startRecognitionOnEnd && videoCallPage.classList.contains('opacity-100')) {
+                            startVoiceRecognition(false); 
+                        }
+                    };
+                    source.start();
+                    startLipAnimation(analyser);
+                } else {
+                    // Log a clear message when voice generation fails but API call succeeds
+                    logVideo("AI voice could not be generated. Check response or language support.");
+                    // Still proceed to start recognition if requested
+                    if (startRecognitionOnEnd && videoCallPage.classList.contains('opacity-100')) {
+                        startVoiceRecognition(false);
+                    }
+                }
+            } catch (error) {
+                console.error('TTS API call failed:', error);
+                logVideo("A network error occurred. Voice unavailable.");
+                // Still proceed to start recognition if requested
+                if (startRecognitionOnEnd && videoCallPage.classList.contains('opacity-100')) {
+                    startVoiceRecognition(false);
+                }
+            }
+        }
+        
+        async function handleVoiceCommand(command) {
+            if (!apiKey) {
+                logVideo("Voice features are disabled. API key is missing.");
+                return;
+            }
+            
+            logVideo(translations[currentLanguage]['chat-thinking-message']);
+            
+            let languagePrompt;
+            switch (currentLanguage) {
+                case 'hi-IN': languagePrompt = ' in Hindi'; break;
+                case 'mr-IN': languagePrompt = ' in Marathi'; break;
+                case 'bn-IN': languagePrompt = ' in Bengali'; break;
+                case 'ta-IN': languagePrompt = ' in Tamil'; break;
+                case 'te-IN': languagePrompt = ' in Telugu'; break;
+                case 'kn-IN': languagePrompt = ' in Kannada'; break;
+                case 'ml-IN': languagePrompt = ' in Malayalam'; break;
+                case 'gu-IN': languagePrompt = ' in Gujarati'; break;
+                case 'pa-IN': languagePrompt = ' in Punjabi'; break;
+                case 'or-IN': languagePrompt = ' in Odia'; break;
+                default: languagePrompt = ' in English';
+            }
+
+            const systemInstruction = `You are a helpful, friendly, and concise medical AI assistant named Dr. Quick. Provide a comprehensive response for the following symptoms. Your response must be${languagePrompt} and formatted clearly with sections for Diagnosis, Medicine, and Home Remedy.
+            
+            **MEDICINE SECTION REQUIREMENTS:**
+            1. Suggest the *cheapest generic medicine name* available in India, followed by one common brand name in parentheses (e.g., Paracetamol (Dolo 650)).
+            2. Include its *approximate price in INR* (e.g., Approx. ₹ 20 for 10 tablets).
+            3. Explain *how it works* (mechanism).
+            4. List 1-2 major *side effects*.
+
+            **HOME REMEDY SECTION REQUIREMENTS:**
+            1. Suggest a *simple, effective Ayurvedic or kitchen-based home remedy* that uses only common ingredients (like ginger, honey, turmeric, salt, etc.).
+            
+            **CONTEXTUAL REQUIREMENTS:**
+            - Critically consider the user's health profile (age, gender, pre-existing diseases) for all suggestions.
+            - Do not provide any disclaimers or extra details outside of the requested format (Diagnosis, Medicine, Home Remedy). Use simple markdown for structure (e.g., **bold**, new lines, headers).
+            
+            User Health Profile:
+            - Gender: ${userData.gender}
+            - Age: ${userData.age}
+            - Pre-existing diseases: ${userData.diseases || 'None'}
+            
+            User Symptoms: ${command}`;
+
+            const geminiPayload = {
+                contents: [{ parts: [{ text: command }] }],
+                systemInstruction: {
+                    parts: [{ text: systemInstruction }]
+                }
+            };
+            const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            
+            let responseText = "I'm sorry, I couldn't get a response from the AI.";
+
+            try {
+                const response = await fetch(geminiApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(geminiPayload)
+                });
+                const result = await response.json();
+                responseText = result?.candidates?.[0]?.content?.parts?.[0]?.text || responseText;
+            } catch (error) {
+                console.error('Gemini API call failed:', error);
+            } finally {
+                logVideo(responseText);
+                await speakAndAnimate(responseText, true); // Tell speakAndAnimate to start recognition after speaking
+            }
+        }
+
+        function startVoiceRecognition(isInitial = false) {
+            if (isListening) return;
+            
+            if (!('SpeechRecognition' in window)) {
+                showModal("Sorry, your browser doesn't support Speech Recognition.");
+                return;
+            }
+
+            if (!audioContext || audioContext.state === 'closed') {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = currentLanguage;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            
+            // Determine which page is active to handle the result appropriately
+            const sourcePage = videoCallPage.classList.contains('opacity-100') ? 'video' : 'chat';
+
+
+            recognition.onstart = () => {
+                isListening = true;
+                logVideo("Listening...");
+                if (micButton) {
+                    micButton.style.backgroundColor = '#10B981';
+                    micButton.style.color = '#fff';
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const speechResult = event.results[0][0].transcript;
+                recognition.stop();
+                if (sourcePage === 'chat') {
+                    // For chat, populate input and submit form
+                    userInput.value = speechResult;
+                    chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                } else {
+                    // For video, handle command directly
+                    logVideo("You said: " + speechResult);
+                    handleVoiceCommand(speechResult);
+                }
+
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                if (micButton) {
+                    micButton.style.backgroundColor = '#E5E7EB';
+                    micButton.style.color = '#111827';
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                isListening = false;
+                let errorMsg = "An error occurred. Please try again.";
+                if (event.error === 'network') {
+                    errorMsg = "There seems to be a network issue. Please check your internet connection and try again.";
+                } else if (event.error === 'no-speech'){
+                    errorMsg = "I didn't hear anything. Please try again.";
+                } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    errorMsg = "Microphone access is required for this feature. Please allow it in your browser settings.";
+                }
+
+                if (sourcePage === 'video') {
+                    logVideo(errorMsg);
+                    speakAndAnimate(errorMsg, true); // Allow re-entry to listening state
+                } else {
+                    showModal(errorMsg);
+                }
+                if (micButton) {
+                    micButton.style.backgroundColor = '#E5E7EB';
+                    micButton.style.color = '#111827';
+                }
+            };
+            
+            if (isInitial) {
+                // Initial welcome message (voice)
+                const welcomeMsg = translations[currentLanguage]['chat-welcome-message'];
+                logVideo(welcomeMsg);
+                // The third argument (true) tells speakAndAnimate to start recognition upon finishing speech.
+                speakAndAnimate(welcomeMsg, true); 
+            } else {
+                recognition.start();
+            }
+        }
+
+        // --- Event Listeners for merged functionality ---
+        // For the main chat page's mic button
+        if(micButton) {
+            micButton.addEventListener('click', () => {
+                if (isListening) {
+                    if (recognition) recognition.stop();
+                } else {
+                    startVoiceRecognition();
+                }
+            });
+        }
+        
+        // For the video call page's tap-to-start feature
+        videoCallPage.addEventListener('click', () => {
+            if (videoCallPage.classList.contains('opacity-100') && !isListening && !currentAudioSource) {
+                startVoiceRecognition(true); // isInitial = true to speak welcome first
+            }
+        });
+
+
+    </script>
+</body>
+</html>
