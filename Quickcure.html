@@ -1685,7 +1685,7 @@
                     }
 
                     let generatedText;
-                    const apiKey = "AIzaSyDI0eMcxn0v7ns1cNjDIKTcN4T657Xoi2o"; // Set to empty string for secure environment variable injection
+                    const apiKey = "api.env"; // Set to empty string for secure environment variable injection
                     
                     const systemInstruction = `You are a helpful, friendly, and concise medical AI assistant named Dr. Quick. Provide a comprehensive response for the following symptoms. Your response must be${languagePrompt} and formatted clearly with sections for Diagnosis, Medicine, Interactions, Precautions, Alternatives, and Home Remedy.
             
@@ -1765,7 +1765,7 @@
         const __firebase_config = typeof window.__firebase_config !== 'undefined' ? JSON.parse(window.__firebase_config) : {};
         const __initial_auth_token = typeof window.__initial_auth_token !== 'undefined' ? window.__initial_auth_token : undefined;
         // CRITICAL: API keys should NOT be stored in client-side code.
-        const apiKey = "AIzaSyDI0eMcxn0v7ns1cNjDIKTcN4T657Xoi2o";
+        const apiKey = "api.env";
         
         window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
